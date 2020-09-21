@@ -1,2 +1,2 @@
 # SP2PythonCompiler
-Labwork for System Programming Course
+Labwork for system programming course

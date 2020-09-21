@@ -4,7 +4,11 @@ namespace Lab
 {
     public enum TokenKind {
         NAME,
-        NUMBER,
+        INT,
+        FLOAT,
+        HEXNUM,
+        BINNUM,
+        OCTNUM,
         STRING,
         NEWLINE,
         INDENT,

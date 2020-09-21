@@ -8,7 +8,7 @@ namespace Lab
         static void Main(string[] args)
         {
             string code = "def main():\n" +
-                          $"\treturn \"fuck yeah\"\n";
+                          $"\treturn 0b01001";
             
             Console.WriteLine(code);
 

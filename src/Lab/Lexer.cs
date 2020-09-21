@@ -1,7 +1,7 @@
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Text;
+using System.Linq;
 
 namespace Lab
 {
@@ -57,8 +57,7 @@ namespace Lab
                 return false;
             }
             
-            int tabsC = countTabs(str);
-            int pos = 0;
+            var tabsC = CountTabs(str);
             if (tabsC - _currentLevel > 1)
             {
                 throw new CompilerException("Not expected indent");
@@ -96,7 +95,7 @@ namespace Lab
             //str = str.Remove(0, tabsC);
 
             //int toDel = 0;
-            pos = tabsC;
+            var pos = tabsC;
 
             while (pos < str.Length)
             {
@@ -105,11 +104,11 @@ namespace Lab
                 {
                     pos++;
                 }
-                else if (Char.IsDigit(str[pos]))
+                else if (char.IsDigit(str[pos]))
                 {
                     pos += StartsWithDigit(str, row, pos);
                 }
-                else if (Char.IsLetter(str[pos]))
+                else if (char.IsLetter(str[pos]))
                 {
                     pos += StartsWithLetter(str, row, pos);
                 }
@@ -128,14 +127,127 @@ namespace Lab
 
         private int StartsWithDigit(string str, int row, int col)
         {
-            
-            return 0;
+            var pos = col;
+            var type = TokenKind.INT;
+            var st = new StringBuilder(str.Length - col);
+            while (pos < str.Length)
+            {
+                if (char.IsDigit(str[pos]))
+                {
+                    st.Append(str[pos]);
+                }
+                else if (str[pos].Equals('x') || str[pos].Equals('b') || str[pos].Equals('o') || str[pos].Equals('.'))
+                {
+                    switch (str[pos])
+                    {
+                        case '.': type = TokenKind.FLOAT;
+                            break;
+                        case  'x': type = TokenKind.HEXNUM;
+                            break;
+                        case  'b': type = TokenKind.BINNUM;
+                            break;
+                        case  'o': type = TokenKind.OCTNUM;
+                            break;
+                    }
+                    st.Append(str[pos]);
+                }
+                pos++;
+            }
+
+            if (type == TokenKind.INT)
+            {
+                int res = 0;
+                if (int.TryParse(st.ToString(), out res))
+                {
+                    _tokens.Add(new Token()
+                    {
+                        Kind = TokenKind.INT,
+                        data = res,
+                        row = row,
+                        column = col
+                    });
+                    return st.Length;
+                }
+            }
+            else if (type == TokenKind.FLOAT)
+            {
+                float res = 0;
+                if (float.TryParse(st.ToString(), out res))
+                {
+                    _tokens.Add(new Token()
+                    {
+                        Kind = TokenKind.FLOAT,
+                        data = res,
+                        row = row,
+                        column = col
+                    });
+                    return st.Length;
+                }
+            }
+            else if (type == TokenKind.BINNUM)
+            {
+                if (st[0].Equals('0') &&
+                    st.ToString().Substring(2).All(num => num.Equals('0') || num.Equals('1')) &&
+                    st[1].Equals('b'))
+                {
+                    _tokens.Add(new Token()
+                    {
+                        Kind = TokenKind.INT,
+                        data = Convert.ToInt32(st.ToString().Substring(2), 2),
+                        row = row,
+                        column = col
+                    });
+                    return st.Length;
+                }
+            }
+            else if (type == TokenKind.HEXNUM)
+            {
+                var range = new List<char>()
+                {
+                    '0', '1', '2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f'
+                };
+                if (st[0].Equals('0') &&
+                    st.ToString().Substring(2).All(num => range.Contains(num)) &&
+                    st[1].Equals('x'))
+                {
+                    _tokens.Add(new Token()
+                    {
+                        Kind = TokenKind.INT,
+                        data = Convert.ToInt32(st.ToString(), 16),
+                        row = row,
+                        column = col
+                    });
+                    return st.Length;
+                }
+            }
+            else if (type == TokenKind.INT)
+            {
+                var range = new List<char>()
+                {
+                    '0', '1', '2','3','4','5','6','7'
+                };
+                if (st[0].Equals('0') &&
+                    st.ToString().Substring(2).All(num => range.Contains(num)) &&
+                    st[1].Equals('o'))
+                {
+                    _tokens.Add(new Token()
+                    {
+                        Kind = TokenKind.OCTNUM,
+                        data = Convert.ToInt32(st.ToString().Substring(2), 8),
+                        row = row,
+                        column = col
+                    });
+                    return st.Length;
+                }
+            }
+
+            throw new CompilerException($"invalid syntax at {row}:{col}");
         }
 
         private int StartsWithSym(string str, int row, int col)
         {
-            StringBuilder st = new StringBuilder(str.Length - col);
-            int pos = col;
+            var st = new StringBuilder(str.Length - col);
+            var pos = col;
             while (pos < str.Length)
             {
                 if (Char.IsSymbol(str[pos]))
@@ -235,9 +347,9 @@ namespace Lab
 
         private int StartsWithLetter(string str, int row, int col)
         {
-            StringBuilder st = new StringBuilder(str.Length - col);
-            int pos = col;
-            while (Char.IsDigit(str[pos]) || Char.IsLetter(str[pos]))
+            var st = new StringBuilder(str.Length - col);
+            var pos = col;
+            while (char.IsDigit(str[pos]) || Char.IsLetter(str[pos]))
             {
                 st.Append(str[pos]);
                 pos++;
@@ -269,9 +381,9 @@ namespace Lab
             return st.ToString().Length;
         }
 
-        private int countTabs(string str)
+        private static int CountTabs(string str)
         {
-            int res = 0;
+            var res = 0;
 
             foreach (var ch in str)
             {
@@ -326,7 +438,7 @@ namespace Lab
             return 0;
         }
 
-        public List<Token> GetTokensList()
+        public IEnumerable<Token> GetTokensList()
         {
             return _tokens;
         }
