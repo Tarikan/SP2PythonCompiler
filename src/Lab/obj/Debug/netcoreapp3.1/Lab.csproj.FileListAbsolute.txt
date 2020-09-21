@@ -1,0 +1,13 @@
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/bin/Debug/netcoreapp3.1/Lab
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/bin/Debug/netcoreapp3.1/Lab.deps.json
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/bin/Debug/netcoreapp3.1/Lab.runtimeconfig.json
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/bin/Debug/netcoreapp3.1/Lab.runtimeconfig.dev.json
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/bin/Debug/netcoreapp3.1/Lab.dll
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/bin/Debug/netcoreapp3.1/Lab.pdb
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/obj/Debug/netcoreapp3.1/Lab.csprojAssemblyReference.cache
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/obj/Debug/netcoreapp3.1/Lab.AssemblyInfoInputs.cache
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/obj/Debug/netcoreapp3.1/Lab.AssemblyInfo.cs
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/obj/Debug/netcoreapp3.1/Lab.csproj.CoreCompileInputs.cache
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/obj/Debug/netcoreapp3.1/Lab.dll
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/obj/Debug/netcoreapp3.1/Lab.pdb
+/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/obj/Debug/netcoreapp3.1/Lab.genruntimeconfig.cache
