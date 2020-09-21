@@ -15,11 +15,14 @@ namespace Lab
             Lexer l = new Lexer(code);
             
             l.GetTokens();
-
+            
+            Parser p = new Parser(l.GetTokensList());
+            
+            /*
             foreach (var t in l.GetTokensList())
             {
                 Console.WriteLine(t.ToString());
-            }
+            }*/
         }
     }
 }

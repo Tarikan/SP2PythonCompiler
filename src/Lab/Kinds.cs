@@ -4,6 +4,10 @@ namespace Lab
 {
     public enum TokenKind {
         NAME,
+        RETURN,
+        DEF,
+        FOR,
+        IF,
         INT,
         FLOAT,
         HEXNUM,
@@ -113,32 +117,33 @@ namespace Lab
         
         public static TokenKind LexerOneChar(int c1)
         {
-            switch (c1) {
-                case '%': return TokenKind.PERCENT;
-                case '&': return TokenKind.AMPER;
-                case '(': return TokenKind.LPAR;
-                case ')': return TokenKind.RPAR;
-                case '*': return TokenKind.STAR;
-                case '+': return TokenKind.PLUS;
-                case ',': return TokenKind.COMMA;
-                case '-': return TokenKind.MINUS;
-                case '.': return TokenKind.DOT;
-                case '/': return TokenKind.SLASH;
-                case ':': return TokenKind.COLON;
-                case ';': return TokenKind.SEMI;
-                case '<': return TokenKind.LESS;
-                case '=': return TokenKind.EQUAL;
-                case '>': return TokenKind.GREATER;
-                case '@': return TokenKind.AT;
-                case '[': return TokenKind.LSQB;
-                case ']': return TokenKind.RSQB;
-                case '^': return TokenKind.CIRCUMFLEX;
-                case '{': return TokenKind.LBRACE;
-                case '|': return TokenKind.VBAR;
-                case '}': return TokenKind.RBRACE;
-                case '~': return TokenKind.TILDE;
-            }
-            return TokenKind.OP;
+            return c1 switch
+            {
+                '%' => TokenKind.PERCENT,
+                '&' => TokenKind.AMPER,
+                '(' => TokenKind.LPAR,
+                ')' => TokenKind.RPAR,
+                '*' => TokenKind.STAR,
+                '+' => TokenKind.PLUS,
+                ',' => TokenKind.COMMA,
+                '-' => TokenKind.MINUS,
+                '.' => TokenKind.DOT,
+                '/' => TokenKind.SLASH,
+                ':' => TokenKind.COLON,
+                ';' => TokenKind.SEMI,
+                '<' => TokenKind.LESS,
+                '=' => TokenKind.EQUAL,
+                '>' => TokenKind.GREATER,
+                '@' => TokenKind.AT,
+                '[' => TokenKind.LSQB,
+                ']' => TokenKind.RSQB,
+                '^' => TokenKind.CIRCUMFLEX,
+                '{' => TokenKind.LBRACE,
+                '|' => TokenKind.VBAR,
+                '}' => TokenKind.RBRACE,
+                '~' => TokenKind.TILDE,
+                _ => TokenKind.OP
+            };
         }
         
         public static TokenKind LexerTwoChars(int c1, int c2)

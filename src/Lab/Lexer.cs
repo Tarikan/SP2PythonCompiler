@@ -138,17 +138,14 @@ namespace Lab
                 }
                 else if (str[pos].Equals('x') || str[pos].Equals('b') || str[pos].Equals('o') || str[pos].Equals('.'))
                 {
-                    switch (str[pos])
+                    type = str[pos] switch
                     {
-                        case '.': type = TokenKind.FLOAT;
-                            break;
-                        case  'x': type = TokenKind.HEXNUM;
-                            break;
-                        case  'b': type = TokenKind.BINNUM;
-                            break;
-                        case  'o': type = TokenKind.OCTNUM;
-                            break;
-                    }
+                        '.' => TokenKind.FLOAT,
+                        'x' => TokenKind.HEXNUM,
+                        'b' => TokenKind.BINNUM,
+                        'o' => TokenKind.OCTNUM,
+                        _ => type
+                    };
                     st.Append(str[pos]);
                 }
                 pos++;
@@ -355,7 +352,47 @@ namespace Lab
                 pos++;
             }
 
-            if (Kinds.Keywords.Contains(st.ToString()))
+            if (st.ToString().Equals("def"))
+            {
+                _tokens.Add(new Token()
+                {
+                    Kind = TokenKind.DEF,
+                    data = st.ToString(),
+                    row = row,
+                    column = col
+                });
+            }
+            else if (st.ToString().Equals("for"))
+            {
+                _tokens.Add(new Token()
+                {
+                    Kind = TokenKind.FOR,
+                    data = st.ToString(),
+                    row = row,
+                    column = col
+                });
+            }
+            else if (st.ToString().Equals("return"))
+            {
+                _tokens.Add(new Token()
+                {
+                    Kind = TokenKind.RETURN,
+                    data = st.ToString(),
+                    row = row,
+                    column = col
+                });
+            }
+            else if (st.ToString().Equals("if"))
+            {
+                _tokens.Add(new Token()
+                {
+                    Kind = TokenKind.IF,
+                    data = st.ToString(),
+                    row = row,
+                    column = col
+                });
+            }
+            else if (Kinds.Keywords.Contains(st.ToString()))
             {
                 _tokens.Add(new Token()
                 {
@@ -438,7 +475,7 @@ namespace Lab
             return 0;
         }
 
-        public IEnumerable<Token> GetTokensList()
+        public List<Token> GetTokensList()
         {
             return _tokens;
         }
