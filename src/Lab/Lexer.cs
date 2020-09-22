@@ -450,7 +450,7 @@ namespace Lab
                         _tokens.Add(new Token()
                         {
                             Kind = TokenKind.STRING,
-                            data = st.ToString(),
+                            data = quote + st.ToString() + quote,
                             row = row,
                             column = col
                         });
@@ -478,6 +478,14 @@ namespace Lab
         public List<Token> GetTokensList()
         {
             return _tokens;
+        }
+
+        public void PrintTokens()
+        {
+            foreach (var token in _tokens)
+            {
+                Console.WriteLine(token.ToString());
+            }
         }
     }
 }

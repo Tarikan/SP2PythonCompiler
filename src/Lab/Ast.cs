@@ -1,22 +1,44 @@
+using System.Collections.Generic;
+
 namespace Lab
 {
     public class Ast
     {
-        private readonly AstNode _root;
+        public readonly RootNode root;
         
-        public Ast(AstNode root)
+        public Ast(RootNode root)
         {
-            _root = root;
+            this.root = root;
         }
 
-        public Ast(Token token)
+        public Ast()
         {
-           // _root = new AstNode(token);
+            root = new RootNode();
         }
 
-        public AstNode GetRoot()
+        public RootNode GetRoot()
         {
-            return _root;
+            return root;
+        }
+    }
+
+    public class RootNode
+    {
+        private List<AstNode> _childrenNodes;
+
+        public RootNode()
+        {
+            _childrenNodes = new List<AstNode>();
+        }
+        
+        public void AddChild(AstNode child)
+        {
+            _childrenNodes.Add(child);
+        }
+
+        public List<AstNode> GetChildren()
+        {
+            return _childrenNodes;
         }
     }
 }

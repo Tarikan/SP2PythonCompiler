@@ -8,7 +8,8 @@ namespace Lab
         static void Main(string[] args)
         {
             string code = "def main():\n" +
-                          $"\treturn 0b01001";
+                          $"\treturn 0b01001\n" +
+                          $"main()";
             
             Console.WriteLine(code);
 
@@ -16,13 +17,15 @@ namespace Lab
             
             l.GetTokens();
             
-            Parser p = new Parser(l.GetTokensList());
             
-            /*
-            foreach (var t in l.GetTokensList())
-            {
-                Console.WriteLine(t.ToString());
-            }*/
+            
+            //l.PrintTokens();
+            
+            Parser p = new Parser(l.GetTokensList());
+
+            AsmGenerator gen = new AsmGenerator(p.GetAst());
+            
+            gen.GenerateAsm();
         }
     }
 }
