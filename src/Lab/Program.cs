@@ -1,4 +1,5 @@
 ﻿using System;
+using System.IO;
 using System.Linq;
 
 namespace Lab
@@ -7,9 +8,18 @@ namespace Lab
     {
         static void Main(string[] args)
         {
-            string code = "def main():\n" +
-                          $"\treturn 0b01001\n" +
-                          $"main()";
+            string code = System.IO.File.ReadAllText(Directory.GetParent(
+                                                         System.IO.Directory.GetCurrentDirectory())
+                                                         .Parent
+                                                         .Parent
+                                                         .Parent
+                                                         .Parent
+                                                         .FullName + 
+                                                     "/input.py");
+            
+            // string code = "def main():\n" +
+            //               $"\treturn 0b01001\n" +
+            //               $"main()";
             
             Console.WriteLine(code);
 

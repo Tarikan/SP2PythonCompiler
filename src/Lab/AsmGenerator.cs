@@ -1,7 +1,10 @@
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Text;
 
 namespace Lab
 {
@@ -65,11 +68,24 @@ namespace Lab
             GetFunctions();
             GetCalls();
             
+            //Console.WriteLine(Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName);
             
+            using (FileStream fs = File.Create(
+                Directory.GetParent(
+                    System.IO.Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName + 
+                "/output.asm"))
+            {
+                byte[] info = new UTF8Encoding(true).GetBytes(
+                    string.Format(_templateMasm, string.Join("", _functionProtoNames.ToArray()),
+                    string.Join("", _statements.ToArray()),
+                    string.Join("", _functions.ToArray())));
+                // Add some information to the file.
+                fs.Write(info, 0, info.Length);
+            }
 
-            Console.WriteLine(string.Format(_templateMasm, string.Join("", _functionProtoNames.ToArray()),
-                string.Join("", _statements.ToArray()),
-                string.Join("", _functions.ToArray())));
+            // Console.WriteLine(string.Format(_templateMasm, string.Join("", _functionProtoNames.ToArray()),
+            //     string.Join("", _statements.ToArray()),
+            //     string.Join("", _functions.ToArray())));
         }
 
         private void GetFunctions()
