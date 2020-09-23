@@ -11,6 +11,7 @@ includelib  G:\masm32\lib\masm32.lib
 _main        PROTO
 
 main PROTO
+strFunc PROTO
 
 .data
 buff        db 11 dup(?)
@@ -25,6 +26,7 @@ _start:
 _main PROC
 
 	call main
+call strFunc
 
 	ret
 
@@ -34,4 +36,8 @@ main PROC
 mov eax, 1
 ret
 main ENDP
+strFunc PROC
+mov eax, "asdf"
+ret
+strFunc ENDP
 END _start
