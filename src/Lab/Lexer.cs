@@ -152,6 +152,15 @@ namespace Lab
                     };
                     st.Append(str[pos]);
                 }
+                else if (type == TokenKind.HEXNUM &&
+                         new List<char>()
+                         {
+                             'A','B','C','D','E','F','a','b','c','d','e','f'
+                         }
+                             .Contains(str[pos]))
+                {
+                    st.Append(str[pos]);
+                }
                 pos++;
             }
 
