@@ -23,15 +23,11 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b1710137-f36e-415c-bb0f-8dac499094a9" name="Default Changelist" comment="IT`S WORKING!!!">
-      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Lab1/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Lab1/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output.asm" beforeDir="false" afterPath="$PROJECT_DIR$/output.asm" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/AsmGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/AsmGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Lab/CompilerException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/CompilerException.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/Lexer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/Lexer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/Parser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/Program.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Lab/SyntaxException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/SyntaxException.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/Lab.dll" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/Lab.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/Lab.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/Lab.pdb" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/obj/Debug/netcoreapp3.1/Lab.csprojAssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/obj/Debug/netcoreapp3.1/Lab.csprojAssemblyReference.cache" afterDir="false" />
@@ -80,13 +76,13 @@
         <option value="$PROJECT_DIR$/src/Lab/AST_Node.cs" />
         <option value="$PROJECT_DIR$/input.py" />
         <option value="$PROJECT_DIR$/.gitignore" />
-        <option value="$PROJECT_DIR$/src/Lab/AsmGenerator.cs" />
         <option value="$PROJECT_DIR$/src/Lab/CompilerException.cs" />
         <option value="$PROJECT_DIR$/src/Lab/SyntaxException.cs" />
-        <option value="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/input.txt" />
-        <option value="$PROJECT_DIR$/src/Lab/Program.cs" />
         <option value="$PROJECT_DIR$/src/Lab/Lexer.cs" />
         <option value="$PROJECT_DIR$/src/Lab/Parser.cs" />
+        <option value="$PROJECT_DIR$/src/Lab/AsmGenerator.cs" />
+        <option value="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/input.txt" />
+        <option value="$PROJECT_DIR$/src/Lab/Program.cs" />
       </list>
     </option>
   </component>
@@ -165,7 +161,8 @@
       <workItem from="1600782435793" duration="25148000" />
       <workItem from="1600872866854" duration="1887000" />
       <workItem from="1600944828777" duration="4749000" />
-      <workItem from="1600953529950" duration="5004000" />
+      <workItem from="1600953529950" duration="5592000" />
+      <workItem from="1600968122698" duration="2482000" />
     </task>
     <task id="LOCAL-00001" summary="IT`S WORKING!!!">
       <created>1600802226159</created>
@@ -203,6 +200,10 @@
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
     <state x="707" y="383" width="499" height="344" key="#Notifications/0.28.1920.1052@0.28.1920.1052" timestamp="1600952618629" />
+    <state x="793" y="409" width="333" height="293" key="#Other_File_Types" timestamp="1600970471410">
+      <screen x="0" y="28" width="1920" height="1052" />
+    </state>
+    <state x="793" y="409" width="333" height="293" key="#Other_File_Types/0.28.1920.1052@0.28.1920.1052" timestamp="1600970471410" />
     <state x="708" y="347" width="498" height="416" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1600802944067">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
@@ -211,22 +212,22 @@
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
     <state x="740" y="299" width="428" height="513" key="FileChooserDialogImpl/0.28.1920.1052@0.28.1920.1052" timestamp="1600954168979" />
-    <state width="1874" height="266" key="GridCell.Tab.0.bottom" timestamp="1600958427843">
+    <state width="1874" height="262" key="GridCell.Tab.0.bottom" timestamp="1600970476338">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
-    <state width="1874" height="266" key="GridCell.Tab.0.bottom/0.28.1920.1052@0.28.1920.1052" timestamp="1600958427843" />
-    <state width="1874" height="266" key="GridCell.Tab.0.center" timestamp="1600958427842">
+    <state width="1874" height="262" key="GridCell.Tab.0.bottom/0.28.1920.1052@0.28.1920.1052" timestamp="1600970476338" />
+    <state width="1874" height="262" key="GridCell.Tab.0.center" timestamp="1600970476337">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
-    <state width="1874" height="266" key="GridCell.Tab.0.center/0.28.1920.1052@0.28.1920.1052" timestamp="1600958427842" />
-    <state width="1874" height="266" key="GridCell.Tab.0.left" timestamp="1600958427842">
+    <state width="1874" height="262" key="GridCell.Tab.0.center/0.28.1920.1052@0.28.1920.1052" timestamp="1600970476337" />
+    <state width="1874" height="262" key="GridCell.Tab.0.left" timestamp="1600970476337">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
-    <state width="1874" height="266" key="GridCell.Tab.0.left/0.28.1920.1052@0.28.1920.1052" timestamp="1600958427842" />
-    <state width="1874" height="266" key="GridCell.Tab.0.right" timestamp="1600958427843">
+    <state width="1874" height="262" key="GridCell.Tab.0.left/0.28.1920.1052@0.28.1920.1052" timestamp="1600970476337" />
+    <state width="1874" height="262" key="GridCell.Tab.0.right" timestamp="1600970476337">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
-    <state width="1874" height="266" key="GridCell.Tab.0.right/0.28.1920.1052@0.28.1920.1052" timestamp="1600958427843" />
+    <state width="1874" height="262" key="GridCell.Tab.0.right/0.28.1920.1052@0.28.1920.1052" timestamp="1600970476337" />
     <state width="1874" height="359" key="GridCell.Tab.1.bottom" timestamp="1600866142443">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>

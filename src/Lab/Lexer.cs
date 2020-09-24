@@ -52,7 +52,8 @@ namespace Lab
         
         private bool ParseLine(string str, int row)
         {
-            if (str.Length != 0 && str[0].Equals('#'))
+            if (str.Length != 0 &&
+                str[0].Equals('#'))
             {
                 return false;
             }
@@ -136,7 +137,10 @@ namespace Lab
                 {
                     st.Append(str[pos]);
                 }
-                else if (str[pos].Equals('x') || str[pos].Equals('b') || str[pos].Equals('o') || str[pos].Equals('.'))
+                else if (str[pos].Equals('x') ||
+                         str[pos].Equals('b') ||
+                         str[pos].Equals('o') ||
+                         str[pos].Equals('.'))
                 {
                     type = str[pos] switch
                     {
@@ -184,7 +188,9 @@ namespace Lab
             else if (type == TokenKind.BINNUM)
             {
                 if (st[0].Equals('0') &&
-                    st.ToString().Substring(2).All(num => num.Equals('0') || num.Equals('1')) &&
+                    st.ToString().Substring(2)
+                        .All(num => num.Equals('0') ||
+                                    num.Equals('1')) &&
                     st[1].Equals('b'))
                 {
                     _tokens.Add(new Token()
@@ -204,7 +210,8 @@ namespace Lab
                     '0', '1', '2','3','4','5','6','7','8','9','A','B','C','D','E','F','a','b','c','d','e','f'
                 };
                 if (st[0].Equals('0') &&
-                    st.ToString().Substring(2).All(num => range.Contains(num)) &&
+                    st.ToString().Substring(2)
+                        .All(num => range.Contains(num)) &&
                     st[1].Equals('x'))
                 {
                     _tokens.Add(new Token()
@@ -224,7 +231,9 @@ namespace Lab
                     '0', '1', '2','3','4','5','6','7'
                 };
                 if (st[0].Equals('0') &&
-                    st.ToString().Substring(2).All(num => range.Contains(num)) &&
+                    st.ToString()
+                        .Substring(2)
+                        .All(num => range.Contains(num)) &&
                     st[1].Equals('o'))
                 {
                     _tokens.Add(new Token()
@@ -346,7 +355,9 @@ namespace Lab
         {
             var st = new StringBuilder(str.Length - col);
             var pos = col;
-            while (char.IsDigit(str[pos]) || char.IsLetter(str[pos]) || str[pos] == '_')
+            while (char.IsDigit(str[pos]) ||
+                   char.IsLetter(str[pos]) ||
+                   str[pos] == '_')
             {
                 st.Append(str[pos]);
                 pos++;
@@ -438,14 +449,16 @@ namespace Lab
 
         private int ParseString(string str, int row, int col)
         {
-            if (str[col].Equals('"') || str[col].Equals('\''))
+            if (str[col].Equals('"') ||
+                str[col].Equals('\''))
             {
                 char quote = str[col];
                 //Console.WriteLine("ParseString");
                 StringBuilder st = new StringBuilder(str.Length - col);
                 for (int i = 0; i < str.Length - col; i++)
                 {
-                    if (str[i + col + 1].Equals(quote) && !str[i + col].Equals('\\'))
+                    if (str[i + col + 1].Equals(quote) && 
+                        !str[i + col].Equals('\\'))
                     {
                         _tokens.Add(new Token()
                         {
@@ -456,7 +469,8 @@ namespace Lab
                         });
                         break;
                     }
-                    else if (i == str.Length - col - 1 && !str[i + col + 1].Equals(quote))
+                    else if (i == str.Length - col - 1 &&
+                             !str[i + col + 1].Equals(quote))
                     {
                         throw new CompilerException($"Expected String at {row + 1}:{str.Length}", row, str.Length);
                     }

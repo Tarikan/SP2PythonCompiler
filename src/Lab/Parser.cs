@@ -93,11 +93,9 @@ namespace Lab
                 def.Return = this.MatchConst();
                 // TODO: add full support for strings
                 if (def.Return != null &&
-                    def.Return.Kind == TokenKind.STRING &&
-                    def.Return.data != null &&
-                    def.Return.data.Length > 6)
+                    def.Return.Kind == TokenKind.STRING)
                 {
-                    throw new CompilerException("Sorry, but strings, that contains more than 4 chars currently not supported");
+                    throw new CompilerException("Sorry, but function return int, not string");
                 }
             }
         }

@@ -68,6 +68,13 @@ namespace Lab
             foreach (DefStatement defStatement in _base.root.GetChildren().Where(
                 obj => obj.GetType() == typeof(DefStatement)))
             {
+                if (defStatement.Return.Kind == TokenKind.FLOAT)
+                {
+                    if (defStatement.Return.data is float)
+                    {
+                        defStatement.Return.data = Convert.ToInt32(defStatement.Return.data);
+                    }
+                }
                 _functionProtoNames.Add(string.Format(ProtoTemplate, defStatement.Name));
                 
                 _functions.Add(string.Format(ProcTemplate, defStatement.Name, defStatement.Return.data));

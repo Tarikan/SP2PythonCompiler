@@ -1,14 +1,11 @@
 ﻿using System;
 using System.Diagnostics;
-using System.IO;
 using System.Text;
 
 namespace Lab
 {
     class Program
     {
-        public static readonly string DebugPath = Directory.GetParent(
-                                                      System.IO.Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName;
 
         public const string PublishPath = "";
         
