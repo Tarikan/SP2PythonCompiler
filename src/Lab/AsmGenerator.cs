@@ -10,22 +10,18 @@ namespace Lab
     {
         private readonly Ast _base;
 
-        private List<string> _functionNames;
-        
         private List<string> _functionProtoNames;
     
         private List<string> _functions;
 
-        private List<string> _calls;
-
         private List<string> _statements;
 
-        private const string _procTemplate = "{0} PROC\n" +
+        private const string ProcTemplate = "{0} PROC\n" +
                                        "mov eax, {1}\n" +
                                        "ret\n" +
                                        "{0} ENDP\n";
 
-        private const string _protoTemplate = "{0} PROTO\n";
+        private const string ProtoTemplate = "{0} PROTO\n";
         
         private string _templateMasm = ".386\n" +
                                       ".model flat,stdcall\n" +
@@ -33,7 +29,6 @@ namespace Lab
                                       "_main        PROTO\n\n" +
                                       "{0}\n" + // insert prototype of functions
                                       ".data\n" +
-                                      "buff        db 11 dup(?)\n\n" +
                                       ".code\n" +
                                       "_start:\n" +
                                       "\tinvoke  _main\n" +
@@ -48,7 +43,6 @@ namespace Lab
         {
             _base = Base;
             _functions = new List<string>();
-            _functionNames = new List<string>();
             _statements = new List<string>();
             _functionProtoNames = new List<string>();
         }
@@ -57,25 +51,16 @@ namespace Lab
         {
             GetFunctions();
             GetCalls();
-            
-            //Console.WriteLine(Directory.GetParent(System.IO.Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName);
-            
+
             using (FileStream fs = File.Create(
-                Directory.GetParent(
-                    System.IO.Directory.GetCurrentDirectory()).Parent.Parent.Parent.Parent.FullName + 
-                "/output.asm"))
+                "output.asm"))
             {
                 byte[] info = new UTF8Encoding(true).GetBytes(
                     string.Format(_templateMasm, string.Join("", _functionProtoNames.ToArray()),
                     string.Join("", _statements.ToArray()),
                     string.Join("", _functions.ToArray())));
-                // Add some information to the file.
                 fs.Write(info, 0, info.Length);
             }
-
-            // Console.WriteLine(string.Format(_templateMasm, string.Join("", _functionProtoNames.ToArray()),
-            //     string.Join("", _statements.ToArray()),
-            //     string.Join("", _functions.ToArray())));
         }
 
         private void GetFunctions()
@@ -83,11 +68,9 @@ namespace Lab
             foreach (DefStatement defStatement in _base.root.GetChildren().Where(
                 obj => obj.GetType() == typeof(DefStatement)))
             {
-                _functionNames.Add(defStatement.Name);
+                _functionProtoNames.Add(string.Format(ProtoTemplate, defStatement.Name));
                 
-                _functionProtoNames.Add(string.Format(_protoTemplate, defStatement.Name));
-                
-                _functions.Add(string.Format(_procTemplate, defStatement.Name, defStatement.Return.data));
+                _functions.Add(string.Format(ProcTemplate, defStatement.Name, defStatement.Return.data));
             }
         }
 

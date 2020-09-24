@@ -1,8 +1,12 @@
 {
   "version": 2,
-  "dgSpecHash": "SF6mHeqOpGu1iUKO7eqJDWO7yRvdlnpWkC8PCkkZCm4QrToF69/xaraY/MUEJsX4SlK35IhTiHiE2XfBYVmMHg==",
+  "dgSpecHash": "4/TKh9TAWpxOekHlB6hTNm47FHmhNOrE0yVRFnTVAOfOfJrMlCGs4/OYBX5LBp69Nb4EOK0+kce4L29dvyTFMw==",
   "success": true,
   "projectFilePath": "/home/tarikan/KPI/V/SP-2/Lab1/src/Lab/Lab.csproj",
-  "expectedPackageFiles": [],
+  "expectedPackageFiles": [
+    "/home/tarikan/.nuget/packages/microsoft.netcore.app.runtime.win-x64/3.1.7/microsoft.netcore.app.runtime.win-x64.3.1.7.nupkg.sha512",
+    "/home/tarikan/.nuget/packages/microsoft.aspnetcore.app.runtime.win-x64/3.1.7/microsoft.aspnetcore.app.runtime.win-x64.3.1.7.nupkg.sha512",
+    "/home/tarikan/.nuget/packages/microsoft.netcore.app.host.win-x64/3.1.7/microsoft.netcore.app.host.win-x64.3.1.7.nupkg.sha512"
+  ],
   "logs": []
 }

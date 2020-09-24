@@ -22,7 +22,7 @@ namespace Lab
 
         public void GetTokens()
         {
-            string[] strings = _code.Split(Environment.NewLine, StringSplitOptions.RemoveEmptyEntries);
+            string[] strings = _code.Split(Environment.NewLine);
             for (int i = 0; i < strings.Length; i++)
             {
                 if (ParseLine(strings[i], i))
@@ -52,7 +52,7 @@ namespace Lab
         
         private bool ParseLine(string str, int row)
         {
-            if (str[0].Equals('#'))
+            if (str.Length != 0 && str[0].Equals('#'))
             {
                 return false;
             }
@@ -60,7 +60,7 @@ namespace Lab
             var tabsC = CountTabs(str);
             if (tabsC - _currentLevel > 1)
             {
-                throw new CompilerException("Not expected indent");
+                throw new CompilerException($"Not expected indent at {row + 1}");
             }
             else if (tabsC - _currentLevel == 1)
             {
@@ -238,7 +238,7 @@ namespace Lab
                 }
             }
 
-            throw new CompilerException($"invalid syntax at {row}:{col}");
+            throw new CompilerException($"invalid syntax at {row + 1}:{col}", row, col);
         }
 
         private int StartsWithSym(string str, int row, int col)
@@ -336,7 +336,7 @@ namespace Lab
             }
             else
             {
-                throw new CompilerException($"Unexpected token at {row}:{col}");
+                throw new CompilerException($"Unexpected token at {row + 1}:{col}", row, col);
             }
 
             return 0;
@@ -458,7 +458,7 @@ namespace Lab
                     }
                     else if (i == str.Length - col - 1 && !str[i + col + 1].Equals(quote))
                     {
-                        throw new CompilerException($"Expected String at {row}:{str.Length}");
+                        throw new CompilerException($"Expected String at {row + 1}:{str.Length}", row, str.Length);
                     }
                     else
                     {

@@ -14,5 +14,11 @@ namespace Lab
         {
             
         }
+
+        public CompilerException(string str, int row, int col)
+            : base(Program.GenerateExceptionWithCode(str, row, col))
+        {
+            
+        }
     }
 }

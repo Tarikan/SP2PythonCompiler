@@ -23,19 +23,25 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="b1710137-f36e-415c-bb0f-8dac499094a9" name="Default Changelist" comment="IT`S WORKING!!!">
+      <change beforePath="$PROJECT_DIR$/.gitignore" beforeDir="false" afterPath="$PROJECT_DIR$/.gitignore" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/.idea.Lab1/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/.idea.Lab1/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/input.py" beforeDir="false" afterPath="$PROJECT_DIR$/input.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/output.asm" beforeDir="false" afterPath="$PROJECT_DIR$/output.asm" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Lab/AST_Node.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/AST_Node.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/AsmGenerator.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/AsmGenerator.cs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/src/Lab/Ast.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/Ast.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Lab/CompilerException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/CompilerException.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/Lexer.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/Lexer.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/Parser.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/Parser.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/Program.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/Program.cs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Lab/SyntaxException.cs" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/SyntaxException.cs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/Lab.dll" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/Lab.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/Lab.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/Lab.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Lab/obj/Debug/netcoreapp3.1/Lab.csprojAssemblyReference.cache" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/obj/Debug/netcoreapp3.1/Lab.csprojAssemblyReference.cache" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/obj/Debug/netcoreapp3.1/Lab.dll" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/obj/Debug/netcoreapp3.1/Lab.dll" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/src/Lab/obj/Debug/netcoreapp3.1/Lab.pdb" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/obj/Debug/netcoreapp3.1/Lab.pdb" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Lab/obj/Lab.csproj.nuget.dgspec.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/obj/Lab.csproj.nuget.dgspec.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Lab/obj/Lab.csproj.nuget.g.props" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/obj/Lab.csproj.nuget.g.props" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Lab/obj/project.assets.json" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/obj/project.assets.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Lab/obj/project.nuget.cache" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/obj/project.nuget.cache" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/src/Lab/obj/rider.project.restore.info" beforeDir="false" afterPath="$PROJECT_DIR$/src/Lab/obj/rider.project.restore.info" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -68,16 +74,19 @@
         <option value="$PROJECT_DIR$/README.md" />
         <option value="$PROJECT_DIR$/src/Lab/Kinds.cs" />
         <option value="$PROJECT_DIR$/src/Lab/SyntaxExeption.cs" />
-        <option value="$PROJECT_DIR$/src/Lab/SyntaxException.cs" />
         <option value="$PROJECT_DIR$/src/Lab/CodeReader.cs" />
         <option value="$PROJECT_DIR$/output.asm" />
-        <option value="$PROJECT_DIR$/src/Lab/Program.cs" />
-        <option value="$PROJECT_DIR$/src/Lab/AsmGenerator.cs" />
-        <option value="$PROJECT_DIR$/src/Lab/Lexer.cs" />
         <option value="$PROJECT_DIR$/src/Lab/Ast.cs" />
         <option value="$PROJECT_DIR$/src/Lab/AST_Node.cs" />
-        <option value="$PROJECT_DIR$/src/Lab/Parser.cs" />
         <option value="$PROJECT_DIR$/input.py" />
+        <option value="$PROJECT_DIR$/.gitignore" />
+        <option value="$PROJECT_DIR$/src/Lab/AsmGenerator.cs" />
+        <option value="$PROJECT_DIR$/src/Lab/CompilerException.cs" />
+        <option value="$PROJECT_DIR$/src/Lab/SyntaxException.cs" />
+        <option value="$PROJECT_DIR$/src/Lab/bin/Debug/netcoreapp3.1/input.txt" />
+        <option value="$PROJECT_DIR$/src/Lab/Program.cs" />
+        <option value="$PROJECT_DIR$/src/Lab/Lexer.cs" />
+        <option value="$PROJECT_DIR$/src/Lab/Parser.cs" />
       </list>
     </option>
   </component>
@@ -93,9 +102,26 @@
     <property name="DebuggerViewTab_PTCS_LastProportionKey" value="0.30005425" />
     <property name="RunOnceActivity.OpenProjectViewOnStart" value="true" />
     <property name="WebServerToolWindowFactoryState" value="false" />
+    <property name="last_opened_file_path" value="$PROJECT_DIR$/../Lab1Test" />
     <property name="settings.editor.selected.configurable" value="preferences.pluginManager" />
   </component>
-  <component name="RunManager">
+  <component name="RunManager" selected=".NET Project.Lab1">
+    <configuration name="Publish Lab to folder (1)" type="DotNetFolderPublish" factoryName="Publish to folder" temporary="true">
+      <riderPublish runtime="linux-x64" self_contained="true" target_folder="$PROJECT_DIR$/../Lab1Test" target_framework="netcoreapp3.1" uuid_high="-4524701827734158169" uuid_low="-8689629907367575396" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Publish Lab to folder (2)" type="DotNetFolderPublish" factoryName="Publish to folder" temporary="true">
+      <riderPublish runtime="linux-x64" self_contained="true" target_folder="$PROJECT_DIR$/../Lab1Test" target_framework="netcoreapp3.1" uuid_high="-4524701827734158169" uuid_low="-8689629907367575396" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Publish Lab to folder (3)" type="DotNetFolderPublish" factoryName="Publish to folder" temporary="true">
+      <riderPublish uuid_high="-4524701827734158169" uuid_low="-8689629907367575396" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Publish Lab to folder" type="DotNetFolderPublish" factoryName="Publish to folder" temporary="true">
+      <riderPublish runtime="linux-x64" self_contained="true" target_folder="$PROJECT_DIR$/../Lab1Test" target_framework="netcoreapp3.1" uuid_high="-4524701827734158169" uuid_low="-8689629907367575396" />
+      <method v="2" />
+    </configuration>
     <configuration name="Lab1" type="DotNetProject" factoryName=".NET Project">
       <option name="EXE_PATH" value="" />
       <option name="PROGRAM_PARAMETERS" value="" />
@@ -114,6 +140,14 @@
         <option name="Build" />
       </method>
     </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Publish to folder.Publish Lab to folder (3)" />
+        <item itemvalue="Publish to folder.Publish Lab to folder (2)" />
+        <item itemvalue="Publish to folder.Publish Lab to folder (1)" />
+        <item itemvalue="Publish to folder.Publish Lab to folder" />
+      </list>
+    </recent_temporary>
   </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
@@ -130,7 +164,8 @@
       <workItem from="1600626079136" duration="46419000" />
       <workItem from="1600782435793" duration="25148000" />
       <workItem from="1600872866854" duration="1887000" />
-      <workItem from="1600944828777" duration="1494000" />
+      <workItem from="1600944828777" duration="4749000" />
+      <workItem from="1600953529950" duration="5004000" />
     </task>
     <task id="LOCAL-00001" summary="IT`S WORKING!!!">
       <created>1600802226159</created>
@@ -164,30 +199,34 @@
     <option name="LAST_COMMIT_MESSAGE" value="IT`S WORKING!!!" />
   </component>
   <component name="WindowStateProjectService">
+    <state x="707" y="383" width="499" height="344" key="#Notifications" timestamp="1600952618629">
+      <screen x="0" y="28" width="1920" height="1052" />
+    </state>
+    <state x="707" y="383" width="499" height="344" key="#Notifications/0.28.1920.1052@0.28.1920.1052" timestamp="1600952618629" />
     <state x="708" y="347" width="498" height="416" key="#com.intellij.fileTypes.FileTypeChooser" timestamp="1600802944067">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
     <state x="708" y="347" width="498" height="416" key="#com.intellij.fileTypes.FileTypeChooser/0.28.1920.1052@0.28.1920.1052" timestamp="1600802944067" />
-    <state x="740" y="299" width="428" height="513" key="FileChooserDialogImpl" timestamp="1599677710185">
+    <state x="740" y="299" width="428" height="513" key="FileChooserDialogImpl" timestamp="1600954168979">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
-    <state x="740" y="299" width="428" height="513" key="FileChooserDialogImpl/0.28.1920.1052@0.28.1920.1052" timestamp="1599677710185" />
-    <state width="1874" height="266" key="GridCell.Tab.0.bottom" timestamp="1600946200747">
+    <state x="740" y="299" width="428" height="513" key="FileChooserDialogImpl/0.28.1920.1052@0.28.1920.1052" timestamp="1600954168979" />
+    <state width="1874" height="266" key="GridCell.Tab.0.bottom" timestamp="1600958427843">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
-    <state width="1874" height="266" key="GridCell.Tab.0.bottom/0.28.1920.1052@0.28.1920.1052" timestamp="1600946200747" />
-    <state width="1874" height="266" key="GridCell.Tab.0.center" timestamp="1600946200747">
+    <state width="1874" height="266" key="GridCell.Tab.0.bottom/0.28.1920.1052@0.28.1920.1052" timestamp="1600958427843" />
+    <state width="1874" height="266" key="GridCell.Tab.0.center" timestamp="1600958427842">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
-    <state width="1874" height="266" key="GridCell.Tab.0.center/0.28.1920.1052@0.28.1920.1052" timestamp="1600946200747" />
-    <state width="1874" height="266" key="GridCell.Tab.0.left" timestamp="1600946200746">
+    <state width="1874" height="266" key="GridCell.Tab.0.center/0.28.1920.1052@0.28.1920.1052" timestamp="1600958427842" />
+    <state width="1874" height="266" key="GridCell.Tab.0.left" timestamp="1600958427842">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
-    <state width="1874" height="266" key="GridCell.Tab.0.left/0.28.1920.1052@0.28.1920.1052" timestamp="1600946200746" />
-    <state width="1874" height="266" key="GridCell.Tab.0.right" timestamp="1600946200747">
+    <state width="1874" height="266" key="GridCell.Tab.0.left/0.28.1920.1052@0.28.1920.1052" timestamp="1600958427842" />
+    <state width="1874" height="266" key="GridCell.Tab.0.right" timestamp="1600958427843">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
-    <state width="1874" height="266" key="GridCell.Tab.0.right/0.28.1920.1052@0.28.1920.1052" timestamp="1600946200747" />
+    <state width="1874" height="266" key="GridCell.Tab.0.right/0.28.1920.1052@0.28.1920.1052" timestamp="1600958427843" />
     <state width="1874" height="359" key="GridCell.Tab.1.bottom" timestamp="1600866142443">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
@@ -260,10 +299,10 @@
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
     <state x="658" y="160" width="598" height="791" key="RiderGenerateDialog/0.28.1920.1052@0.28.1920.1052" timestamp="1600703470084" />
-    <state x="613" y="161" width="992" height="731" key="SettingsEditor" timestamp="1599571969790">
+    <state x="613" y="161" width="992" height="731" key="SettingsEditor" timestamp="1600953502919">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
-    <state x="613" y="161" width="992" height="731" key="SettingsEditor/0.28.1920.1052@0.28.1920.1052" timestamp="1599571969790" />
+    <state x="613" y="161" width="992" height="731" key="SettingsEditor/0.28.1920.1052@0.28.1920.1052" timestamp="1600953502919" />
     <state x="100" y="128" width="1724" height="854" key="VCS.FileHistoryDialog" timestamp="1600879218360">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
@@ -272,6 +311,10 @@
       <screen x="0" y="28" width="1920" height="1052" />
     </state>
     <state x="555" y="287" width="804" height="537" key="Vcs.Push.Dialog.v2/0.28.1920.1052@0.28.1920.1052" timestamp="1600802235586" />
+    <state x="622" y="254" key="run.anything.popup" timestamp="1600953815611">
+      <screen x="0" y="28" width="1920" height="1052" />
+    </state>
+    <state x="622" y="254" key="run.anything.popup/0.28.1920.1052@0.28.1920.1052" timestamp="1600953815611" />
     <state x="623" y="260" width="672" height="678" key="search.everywhere.popup" timestamp="1600946055393">
       <screen x="0" y="28" width="1920" height="1052" />
     </state>

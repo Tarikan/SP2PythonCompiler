@@ -14,5 +14,11 @@ namespace Lab
         {
             
         }
+        
+        public SyntaxException(string str, int row, int col)
+            : base(Program.GenerateExceptionWithCode(str, row, col))
+        {
+            
+        }
     }
 }

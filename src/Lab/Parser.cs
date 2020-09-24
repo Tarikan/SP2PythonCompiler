@@ -8,9 +8,7 @@ namespace Lab
     {
         private Dictionary<string, AstNode> _defAst;
 
-        private Dictionary<string, AstNode> NameSpace;
-        
-        private List<Token> _tokens;
+        private readonly List<Token> _tokens;
 
         private List<Token>.Enumerator _enumerator;
         
@@ -23,8 +21,8 @@ namespace Lab
             _tokens = tokens;
             
             _base = new Ast();
-            
-            var en = _tokens.GetEnumerator();
+
+            using var en = _tokens.GetEnumerator();
             
             _enumerator = _tokens.GetEnumerator();
 
@@ -41,16 +39,22 @@ namespace Lab
                     case TokenKind.NAME: {
                         var temp = this.ParseName();
                         _base.root.AddChild(temp);
-                        if (!_base.root.GetChildren().Any(def => def is DefStatement d && d.Name == temp.Name))
+                        if (!_base.root.GetChildren()
+                            .Any(def =>
+                                def is DefStatement d &&
+                                d.Name == temp.Name))
                         {
-                            throw new SyntaxException($"Name {temp.Name} is not defined at {temp.Row}:{temp.Column}");
+                            throw new SyntaxException(
+                                $"Name {temp.Name} is not defined at {temp.Row + 1}:{temp.Column}",
+                                temp.Row, temp.Column);
                         }
                         this.MatchIndentation();
                         break;
                     }
                     default:
-                        //Console.WriteLine(token.data + " " + token.Kind);
+                    {
                         break;
+                    }
                 }
                 
                 
@@ -59,20 +63,18 @@ namespace Lab
 
         private DefStatement ParseDef()
         {
-            //this.Match(TokenKind.DEF);
-            var def = new DefStatement(_enumerator.Current.row, _enumerator.Current.column);
-            def.Name = this.Match(TokenKind.NAME).data;
-            def.Args = this.MatchArgs();
+            var def = new DefStatement(_enumerator.Current.row, _enumerator.Current.column)
+            {
+                Name = this.Match(TokenKind.NAME).data, Args = this.MatchArgs()
+            };
 
             foreach (var arg in def.Args)
             {
                 Console.WriteLine(arg);
             }
             this.Match(TokenKind.COLON);
-            //this.Match(TokenKind.NEWLINE);
+
             MatchDefBody(def);
-            
-            //Console.WriteLine("def parsed");
             return def;
         }
 
@@ -80,7 +82,6 @@ namespace Lab
         {
             if (this.MatchTrue(TokenKind.NEWLINE))
             {
-                //Console.WriteLine(_enumerator.Current.Kind.ToString());
                 this.Match(TokenKind.INDENT);
                 def.Return = this.MatchReturn();
                 this.Match(TokenKind.NEWLINE);
@@ -90,7 +91,14 @@ namespace Lab
             {
                 this.MatchCurrent(TokenKind.RETURN);
                 def.Return = this.MatchConst();
-                //def.Return = this.MatchReturn();
+                // TODO: add full support for strings
+                if (def.Return != null &&
+                    def.Return.Kind == TokenKind.STRING &&
+                    def.Return.data != null &&
+                    def.Return.data.Length > 6)
+                {
+                    throw new CompilerException("Sorry, but strings, that contains more than 4 chars currently not supported");
+                }
             }
         }
 
@@ -139,7 +147,8 @@ namespace Lab
             default: msg = "Unknown error";
                 break;
             }
-        throw new CompilerException(msg + $" at {token.row}:{token.column}");
+        throw new CompilerException(msg + $" at {token.row + 1}:{token.column}",
+            token.row, token.column);
     }
 
         private Token Match(TokenKind l)
@@ -150,7 +159,8 @@ namespace Lab
                 if (l != _enumerator.Current.Kind)
                 {
                     throw new SyntaxException("Got " + _enumerator.Current.Kind.ToString() + $", {l.ToString()} expected" +
-                                              $" at {_enumerator.Current.row}:{_enumerator.Current.column}");
+                                              $" at {_enumerator.Current.row + 1}:{_enumerator.Current.column}",
+                        _enumerator.Current.row, _enumerator.Current.column);
                 }
                 else
                 {
@@ -169,7 +179,8 @@ namespace Lab
             if (l != _enumerator.Current.Kind)
             {
                 throw new SyntaxException("Got " + _enumerator.Current.Kind.ToString() + $", {l.ToString()} expected" +
-                                          $" at {_enumerator.Current.row}:{_enumerator.Current.column}");
+                                          $" at {_enumerator.Current.row + 1}:{_enumerator.Current.column}",
+                    _enumerator.Current.row, _enumerator.Current.column);
             }
             else
             {
@@ -273,16 +284,17 @@ namespace Lab
                                 return res;
                             default:
                                 throw new SyntaxException(
-                                    $"Unexpected token at {_enumerator.Current.row}:{_enumerator.Current.column}"
+                                    $"Unexpected token at {_enumerator.Current.row + 1}:{_enumerator.Current.column}",
+                                    _enumerator.Current.row, _enumerator.Current.column
                                     );
                         }
                         break;
                     case TokenKind.RPAR:
                         return res;
-                        break;
                     default:
                         throw new SyntaxException(
-                            $"Unexpected token at {_enumerator.Current.row}:{_enumerator.Current.column}"
+                            $"Unexpected token at {_enumerator.Current.row + 1}:{_enumerator.Current.column}",
+                            _enumerator.Current.row, _enumerator.Current.column
                         );
                 }
             }

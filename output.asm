@@ -8,8 +8,6 @@ main PROTO
 str_Func PROTO
 
 .data
-buff        db 11 dup(?)
-
 .code
 _start:
 	invoke  _main
