@@ -95,7 +95,7 @@ namespace Lab
                 if (def.Return != null &&
                     def.Return.Kind == TokenKind.STRING)
                 {
-                    throw new CompilerException("Sorry, but function return int, not string");
+                    throw new CompilerException("Sorry, but function return int, not string", def.Row, def.Column);
                 }
             }
         }

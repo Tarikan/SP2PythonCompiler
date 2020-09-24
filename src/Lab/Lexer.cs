@@ -105,6 +105,10 @@ namespace Lab
                 {
                     pos++;
                 }
+                else if (str[pos] == '#')
+                {
+                    return true;
+                }
                 else if (char.IsDigit(str[pos]))
                 {
                     pos += StartsWithDigit(str, row, pos);
