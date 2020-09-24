@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using System.Security;
+using System.Linq;
 
 namespace Lab
 {
@@ -24,8 +24,6 @@ namespace Lab
             
             _base = new Ast();
             
-            NameSpace = new Dictionary<string, AstNode>();
-
             var en = _tokens.GetEnumerator();
             
             _enumerator = _tokens.GetEnumerator();
@@ -43,12 +41,19 @@ namespace Lab
                     case TokenKind.NAME: {
                         var temp = this.ParseName();
                         _base.root.AddChild(temp);
+                        if (!_base.root.GetChildren().Any(def => def is DefStatement d && d.Name == temp.Name))
+                        {
+                            throw new SyntaxException($"Name {temp.Name} is not defined at {temp.Row}:{temp.Column}");
+                        }
+                        this.MatchIndentation();
                         break;
                     }
                     default:
                         //Console.WriteLine(token.data + " " + token.Kind);
                         break;
                 }
+                
+                
             }
         }
 
@@ -64,7 +69,7 @@ namespace Lab
                 Console.WriteLine(arg);
             }
             this.Match(TokenKind.COLON);
-            this.Match(TokenKind.NEWLINE);
+            //this.Match(TokenKind.NEWLINE);
             MatchDefBody(def);
             
             //Console.WriteLine("def parsed");
@@ -73,17 +78,19 @@ namespace Lab
 
         private void MatchDefBody(DefStatement def)
         {
-            if (!this.MatchTrue(TokenKind.NEWLINE))
+            if (this.MatchTrue(TokenKind.NEWLINE))
             {
                 //Console.WriteLine(_enumerator.Current.Kind.ToString());
-                this.MatchCurrent(TokenKind.INDENT);
+                this.Match(TokenKind.INDENT);
                 def.Return = this.MatchReturn();
                 this.Match(TokenKind.NEWLINE);
                 this.Match(TokenKind.DEDENT);
             }
             else
             {
-                def.Return = this.MatchReturn();
+                this.MatchCurrent(TokenKind.RETURN);
+                def.Return = this.MatchConst();
+                //def.Return = this.MatchReturn();
             }
         }
 
@@ -189,6 +196,32 @@ namespace Lab
             else
             {
                 return false;
+            }
+        }
+        
+        private bool MatchCurrentTrue(TokenKind l)
+        {
+            if (l != _enumerator.Current.Kind)
+            {
+                return false;
+            }
+            else
+            {
+                //Console.WriteLine(_enumerator.Current.ToString());
+                return true;
+            }
+        }
+
+        private void MatchIndentation()
+        {
+            if (_enumerator.MoveNext())
+            {
+                if (!MatchCurrentTrue(TokenKind.NEWLINE) &&
+                    !MatchCurrentTrue(TokenKind.SEMI)&&
+                    !MatchCurrentTrue(TokenKind.DEDENT))
+                {
+                    throw new SyntaxException("Expected new line or semicolon");
+                }
             }
         }
 

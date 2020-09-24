@@ -2,8 +2,6 @@ using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Text;
 
 namespace Lab
@@ -15,7 +13,7 @@ namespace Lab
         private List<string> _functionNames;
         
         private List<string> _functionProtoNames;
-
+    
         private List<string> _functions;
 
         private List<string> _calls;
@@ -32,11 +30,6 @@ namespace Lab
         private string _templateMasm = ".386\n" +
                                       ".model flat,stdcall\n" +
                                       "option casemap:none\n\n" +
-                                      "include     G:\\masm32\\include\\windows.inc\n" +
-                                      "include     G:\\masm32\\include\\kernel32.inc\n" +
-                                      "include     G:\\masm32\\include\\masm32.inc\n" +
-                                      "includelib  G:\\masm32\\lib\\kernel32.lib\n" +
-                                      "includelib  G:\\masm32\\lib\\masm32.lib\n\n" +
                                       "_main        PROTO\n\n" +
                                       "{0}\n" + // insert prototype of functions
                                       ".data\n" +
@@ -44,11 +37,8 @@ namespace Lab
                                       ".code\n" +
                                       "_start:\n" +
                                       "\tinvoke  _main\n" +
-                                      "\tinvoke  _NumbToStr, ebx, ADDR buff\n" +
-                                      "\tinvoke  StdOut,eax\n" +
-                                      "\tinvoke  ExitProcess,0\n\n" +
                                       "_main PROC\n\n" +
-                                      "\t{1}" + // insert code
+                                      "{1}" + // insert code
                                       "\n\tret\n\n" +
                                       "_main ENDP\n\n" +
                                       "{2}" + // insert functions
@@ -115,7 +105,7 @@ namespace Lab
     {
         private static readonly Dictionary<Type, string> TemplateDict = new Dictionary<Type, string>()
         {
-            {typeof(CallStatement), "call {0}\n"}
+            {typeof(CallStatement), "\tcall {0}\n"}
         };
 
         public static string GenerateCode(Statement st)

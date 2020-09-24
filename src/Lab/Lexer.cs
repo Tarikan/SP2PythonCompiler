@@ -346,7 +346,7 @@ namespace Lab
         {
             var st = new StringBuilder(str.Length - col);
             var pos = col;
-            while (char.IsDigit(str[pos]) || Char.IsLetter(str[pos]))
+            while (char.IsDigit(str[pos]) || char.IsLetter(str[pos]) || str[pos] == '_')
             {
                 st.Append(str[pos]);
                 pos++;

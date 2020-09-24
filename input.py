@@ -1,7 +1,7 @@
 def main():
 	return 1
 
-def strFunc(): return "asdf"
+def str_Func(): return "test"
 
 main()
-strFunc()
+str_Func()

@@ -1,17 +1,15 @@
-using System.Collections.Generic;
-
 namespace Lab
 {
     public abstract class AstNode : RootNode
     {
-        private int _row { get; set; }
+        public int Row { get; set; }
         
-        private int _column { get; set; }
+        public int Column { get; set; }
 
         protected AstNode(int row, int col) : base()
         {
-            _row = row;
-            _column = col;
+            this.Row = row;
+            Column = col;
         }
     }
 }
