@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Lab.Parser;
 
 namespace Lab
 {
@@ -68,17 +69,66 @@ namespace Lab
             foreach (DefStatement defStatement in _base.root.GetChildren().Where(
                 obj => obj.GetType() == typeof(DefStatement)))
             {
-                if (defStatement.Return.Kind == TokenKind.FLOAT)
-                {
-                    if (defStatement.Return.data is float)
-                    {
-                        defStatement.Return.data = Convert.ToInt32(defStatement.Return.data);
-                    }
-                }
+                var ret = GenerateReturn(defStatement.Return);
+                
                 _functionProtoNames.Add(string.Format(ProtoTemplate, defStatement.Name));
                 
-                _functions.Add(string.Format(ProcTemplate, defStatement.Name, defStatement.Return.data));
+                _functions.Add(string.Format(ProcTemplate, defStatement.Name, ret));
             }
+        }
+
+        private string GenerateBinExpr(BinOp e)
+        {
+            string code;
+            var a = GenerateExpr(e.LeftExpression);
+            var b = GenerateExpr(e.RightExpression);
+            if (e.Op == TokenKind.PLUS)
+            {
+                code = $"{b}\n{a}\npop eax\npop ecx\nadd eax, ecx\npush eax";
+            }
+            else if (e.Op == TokenKind.MINUS)
+            {
+                code = $"{b}\n{a}\npop eax\npop ecx\nsub eax, ecx\npush eax";
+            }
+            else
+            {
+                throw new CompilerException($"Sorry, but {e.Op.ToString()} not implemented yet");
+            }
+
+            Console.WriteLine(code);
+            return code;
+        }
+
+        private string GenerateUnExpr(UnOp e)
+        {
+            string code = "";
+            var expr = GenerateExpr(e.Expression);
+            if (e.Op == TokenKind.MINUS)
+            {
+                code = expr + $"\npop eax\nneg eax\npush eax";
+            }
+            return code;
+        }
+
+        private string GenerateConstExpr(ConstExpression e)
+        {
+            return $"\npush {e.Data}";
+        }
+
+        private string GenerateReturn(Expression ret)
+        {
+            return $"\n{GenerateExpr(ret)}\npop eax\nret";
+        }
+
+        private string GenerateExpr(Expression e)
+        {
+            return e switch
+            {
+                BinOp binop => GenerateBinExpr((BinOp) e),
+                UnOp unop => GenerateUnExpr((UnOp) e),
+                ConstExpression constExpression => GenerateConstExpr((ConstExpression) e),
+                _ => throw new CompilerException(e.GetType().ToString())
+            };
         }
 
         private void GetCalls()
@@ -87,6 +137,15 @@ namespace Lab
                 obj => obj.GetType() == typeof(CallStatement)))
             {
                 _statements.Add(StatementCodeFactory.GenerateCode(callStatement));
+            }
+        }
+
+        private void GetExpr()
+        {
+            foreach (Expression expression in _base.root.GetChildren().Where(
+                obj => obj.GetType() == typeof(Expression)))
+            {
+                //Console.WriteLine("aaaaa");
             }
         }
     }

@@ -65,7 +65,8 @@ namespace Lab
         ELLIPSIS,
         COLONEQUAL,
         OP,
-        KEYWORD
+        KEYWORD,
+        EXCLAMINATION
     }
 
     public class Kinds
@@ -119,6 +120,7 @@ namespace Lab
         {
             return c1 switch
             {
+                '!' => TokenKind.EXCLAMINATION,
                 '%' => TokenKind.PERCENT,
                 '&' => TokenKind.AMPER,
                 '(' => TokenKind.LPAR,

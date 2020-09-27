@@ -158,12 +158,16 @@ namespace Lab
                 }
                 else if (type == TokenKind.HEXNUM &&
                          new List<char>()
-                         {
-                             'A','B','C','D','E','F','a','b','c','d','e','f'
-                         }
+                             {
+                                 'A', 'B', 'C', 'D', 'E', 'F', 'a', 'b', 'c', 'd', 'e', 'f'
+                             }
                              .Contains(str[pos]))
                 {
                     st.Append(str[pos]);
+                }
+                else
+                {
+                    break;
                 }
                 pos++;
             }
@@ -171,6 +175,7 @@ namespace Lab
             if (type == TokenKind.INT)
             {
                 int res = 0;
+                //Console.WriteLine(st.ToString());
                 if (int.TryParse(st.ToString(), out res))
                 {
                     _tokens.Add(new Token()

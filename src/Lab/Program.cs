@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Diagnostics;
 using System.Text;
+using Lab.Parser;
 
 namespace Lab
 {
@@ -24,8 +25,9 @@ namespace Lab
             
             l.GetTokens();
             
+            //l.PrintTokens();
             
-            Parser p = new Parser(l.GetTokensList());
+            var p = new Parser.Parser(l.GetTokensList());
 
             AsmGenerator gen = new AsmGenerator(p.GetAst());
             
