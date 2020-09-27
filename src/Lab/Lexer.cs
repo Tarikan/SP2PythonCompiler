@@ -193,10 +193,17 @@ namespace Lab
                 float res = 0;
                 if (float.TryParse(st.ToString(), out res))
                 {
+                    // _tokens.Add(new Token()
+                    // {
+                    //     Kind = TokenKind.FLOAT,
+                    //     data = res,
+                    //     row = row,
+                    //     column = col
+                    // });
                     _tokens.Add(new Token()
                     {
-                        Kind = TokenKind.FLOAT,
-                        data = res,
+                        Kind = TokenKind.INT,
+                        data = Convert.ToInt32(res),
                         row = row,
                         column = col
                     });
@@ -242,11 +249,11 @@ namespace Lab
                     return st.Length;
                 }
             }
-            else if (type == TokenKind.INT)
+            else if (type == TokenKind.OCTNUM)
             {
                 var range = new List<char>()
                 {
-                    '0', '1', '2','3','4','5','6','7'
+                    '0', '1', '2', '3','4','5','6','7'
                 };
                 if (st[0].Equals('0') &&
                     st.ToString()
@@ -256,7 +263,7 @@ namespace Lab
                 {
                     _tokens.Add(new Token()
                     {
-                        Kind = TokenKind.OCTNUM,
+                        Kind = TokenKind.INT,
                         data = Convert.ToInt32(st.ToString().Substring(2), 8),
                         row = row,
                         column = col

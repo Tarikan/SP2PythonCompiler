@@ -346,7 +346,7 @@ namespace Lab.Parser
                     );
                 }
             }
-            first.PrintOp(0);
+            //first.PrintOp(0);
             
             return first;
         }

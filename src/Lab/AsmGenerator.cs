@@ -18,8 +18,7 @@ namespace Lab
         private List<string> _statements;
 
         private const string ProcTemplate = "{0} PROC\n" +
-                                       "mov eax, {1}\n" +
-                                       "ret\n" +
+                                       "{1}\n" +
                                        "{0} ENDP\n";
 
         private const string ProtoTemplate = "{0} PROTO\n";
@@ -39,6 +38,8 @@ namespace Lab
                                       "_main ENDP\n\n" +
                                       "{2}" + // insert functions
                                       "END _start\n";
+
+        private string MultMasm = "";
 
         public AsmGenerator(Ast Base)
         {
@@ -70,6 +71,8 @@ namespace Lab
                 obj => obj.GetType() == typeof(DefStatement)))
             {
                 var ret = GenerateReturn(defStatement.Return);
+
+                //Console.WriteLine(ret);
                 
                 _functionProtoNames.Add(string.Format(ProtoTemplate, defStatement.Name));
                 
@@ -90,12 +93,20 @@ namespace Lab
             {
                 code = $"{b}\n{a}\npop eax\npop ecx\nsub eax, ecx\npush eax";
             }
+            else if (e.Op == TokenKind.STAR)
+            {
+                code = $"{b}\n{a}\npop eax\npop ecx\nimul ecx\npush edx";
+            }
+            else if (e.Op == TokenKind.SLASH)
+            {
+                code = $"{b}\n{a}\npop eax\npop ebx\nxor edx, edx\ndiv ebx\npush eax";
+            }
             else
             {
                 throw new CompilerException($"Sorry, but {e.Op.ToString()} not implemented yet");
             }
 
-            Console.WriteLine(code);
+            //Console.WriteLine(code);
             return code;
         }
 
@@ -107,17 +118,21 @@ namespace Lab
             {
                 code = expr + $"\npop eax\nneg eax\npush eax";
             }
+            else
+            {
+                throw new CompilerException($"Sorry, but {e.Op.ToString()} not implemented yet");
+            }
             return code;
         }
 
         private string GenerateConstExpr(ConstExpression e)
         {
-            return $"\npush {e.Data}";
+            return $"push {e.Data}";
         }
 
         private string GenerateReturn(Expression ret)
         {
-            return $"\n{GenerateExpr(ret)}\npop eax\nret";
+            return $"{GenerateExpr(ret)}\npop eax\nret";
         }
 
         private string GenerateExpr(Expression e)

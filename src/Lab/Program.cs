@@ -45,6 +45,17 @@ namespace Lab
         {
             StringBuilder s = new StringBuilder(
                 Code.Split('\n')[row].Length);
+            foreach (var ch in Code.Split('\n')[row])
+            {
+                if (ch == '\t')
+                {
+                    col = col + 8;
+                }
+                else
+                {
+                    break;
+                }
+            }
             for (int i = 0; i < col - 1; i++)
             {
                 s.Append(' ');
