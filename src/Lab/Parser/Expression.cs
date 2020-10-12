@@ -22,6 +22,45 @@ namespace Lab.Parser
         }
     }
     
+	public class CallExpression : Expression
+	{
+		public readonly string name;
+		
+		public CallExpression(int row, int col, string name) : base(row, col)
+        {
+            this.name = name;
+        }
+		
+		public override void PrintOp(int depth)
+        {
+            base.PrintOp(depth);
+            for (int i = 0; i <= depth; i++)
+            {
+                Console.Write('\t');
+            }
+            Console.WriteLine(name);
+        }
+	}
+	
+	public class VarExpression : Expression
+    {
+        public readonly string varName;
+        public VarExpression(int row, int col, string data) : base(row, col)
+        {
+            varName = data;
+        }
+
+        public override void PrintOp(int depth)
+        {
+            base.PrintOp(depth);
+            for (int i = 0; i <= depth; i++)
+            {
+                Console.Write('\t');
+            }
+            Console.WriteLine(varName);
+        }
+    }
+	
     public class ConstExpression : Expression
     {
         public readonly dynamic Data;

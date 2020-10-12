@@ -11,7 +11,7 @@ namespace Lab
         public const string PublishPath = "";
         
         public static readonly string Code = System.IO.File.ReadAllText(PublishPath + 
-                                                                        "input.txt");
+                                                                        "3-8-CSHARP-IO-81-Ivanyshyn.txt");
 
         static void Main(string[] args)
         {

@@ -10,12 +10,35 @@ namespace Lab.Parser
         {
         }
     }
+	
+	public class ExprStatement : Statement
+	{
+		public Expression expr { get; set; }
+		
+		public ExprStatement(int row, int col, Expression e) : base(row, col)
+        {
+            expr = e;
+        }
+	}
+	
+	public class AssignStatement : Statement
+	{
+		public string VarName { get; set; }
+		
+		public Expression VarExpr { get; set; }
+		
+		public AssignStatement(int row, int col, string name, Expression e) : base(row, col)
+        {
+            VarName = name;
+            VarExpr = e;
+        }
+	}
     
     public class DefStatement : Statement
     {
         public List<Token> Args;
 
-        public List<Expression> Expressions;
+        public List<Statement> Statements;
         
 #nullable enable
         public Expression ?Return;
@@ -23,19 +46,19 @@ namespace Lab.Parser
 
         public DefStatement(int row, int col) : base(row, col)
         {
-            Expressions = new List<Expression>();
+            Statements = new List<Statement>();
             
             Args = new List<Token>();
         }
 
-        public void AddExpression(Expression exp)
+        public void AddStatement(Statement st)
         {
-            Expressions.Add(exp);
+            Statements.Add(st);
         }
 
-        public List<Expression> GetExpressions()
+        public List<Statement> GetStatements()
         {
-            return Expressions;
+            return Statements;
         }
     }
     

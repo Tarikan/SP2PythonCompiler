@@ -1,0 +1,8 @@
+def main():
+	return 1
+
+def str_Func():
+	return 2
+
+main()
+str_Func()

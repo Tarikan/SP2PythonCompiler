@@ -10,7 +10,7 @@ namespace Lab.Parser
 
         private readonly List<Token> _tokens;
 
-        private List<Token>.Enumerator _enumerator;
+        private readonly TwoWayEnum<Token> _enumerator;
         
         private readonly Ast _base; 
 
@@ -22,10 +22,13 @@ namespace Lab.Parser
             
             _base = new Ast();
 
-            using var en = _tokens.GetEnumerator();
-            
-            _enumerator = _tokens.GetEnumerator();
+            _enumerator = new TwoWayEnum<Token>(_tokens.GetEnumerator());
 
+            this.Parse();
+        }
+
+        private void Parse()
+        {
             while (_enumerator.MoveNext())
             {
                 var token = _enumerator.Current;
@@ -70,6 +73,7 @@ namespace Lab.Parser
                 }
             }
         }
+		
 
         private DefStatement ParseDef()
         {
@@ -93,6 +97,51 @@ namespace Lab.Parser
             if (this.MatchBool(TokenKind.NEWLINE))
             {
                 this.Match(TokenKind.INDENT);
+                var move = true;
+				while (_enumerator.MoveNext() && move)
+				{
+					var token = _enumerator.Current;
+					switch (token.Kind){
+						case TokenKind.NAME: {
+                            if (_enumerator.MoveNext())
+                            {
+                                if (_enumerator.Current.Kind == TokenKind.EQUAL)
+                                {
+                                    _enumerator.MovePrevious();
+                                    var name = _enumerator.Current.data;
+                                    _enumerator.MoveNext();
+                                    _enumerator.MoveNext();
+                                    var expr = ParseExpr();
+                                    def.AddStatement(new AssignStatement(
+                                        _enumerator.Current.row,
+                                        _enumerator.Current.column,
+                                        name, expr));
+                                    if (!_base.IfVarExist(name))
+                                    {
+                                        _base.AddVar(name);
+                                    }
+                                }
+                                else
+                                {
+                                    _enumerator.MovePrevious();
+                                    def.AddStatement(new ExprStatement(
+                                        _enumerator.Current.row,
+                                        _enumerator.Current.column,
+                                        ParseExpr()));
+                                   ;
+                                }
+                            }
+							break;
+                        }
+                        case TokenKind.RETURN:
+                        {
+                            _enumerator.MovePrevious();
+                            _enumerator.MovePrevious();
+                            move = false;
+                            break;
+                        }
+                    }
+				}
                 def.Return = this.MatchReturn();
                 this.MatchCurrent(TokenKind.NEWLINE);
                 this.Match(TokenKind.DEDENT);
@@ -104,9 +153,9 @@ namespace Lab.Parser
             }
         }
 
-        private CallStatement ParseName()
+        private Statement ParseName()
         {
-            CallStatement res = new CallStatement(_enumerator.Current.row, _enumerator.Current.column);
+            var res = new CallStatement(_enumerator.Current.row, _enumerator.Current.column);
             res.Name = _enumerator.Current.data;
 
             res.Args = this.MatchArgs();
@@ -114,12 +163,6 @@ namespace Lab.Parser
             return res;
         }
 
-        private static List<Expression> ParseExpressions(List<Token>.Enumerator en)
-        {
-            var res = new List<Expression>();
-            // TODO: parse method
-            return res;
-        }
         
         private static void Fail(int errId, Token token)
         {
@@ -346,6 +389,26 @@ namespace Lab.Parser
                     );
                 }
             }
+
+            if (MatchCurrentBool(TokenKind.LESS) ||
+                MatchCurrentBool(TokenKind.GREATER) ||
+                MatchCurrentBool(TokenKind.EQEQUAL) ||
+                MatchCurrentBool(TokenKind.GREATEREQUAL) ||
+                MatchCurrentBool(TokenKind.LESSEQUAL))
+            {
+                var op = _enumerator.Current.Kind;
+                if (_enumerator.MoveNext())
+                {
+                    var third = ParseExpr();
+                    first = new BinOp(first.Row,
+                        first.Column,
+                        op,
+                        first,
+                        third
+                    );
+                }
+            }
+
             //first.PrintOp(0);
             
             return first;
@@ -360,8 +423,8 @@ namespace Lab.Parser
                    MatchCurrentBool(TokenKind.SLASH)))
             {
                 var op = _enumerator.Current.Kind;
-                var ErrRow = _enumerator.Current.row;
-                var ErrCol = _enumerator.Current.column;
+                var errRow = _enumerator.Current.row;
+                var errCol = _enumerator.Current.column;
                 if (_enumerator.MoveNext())
                 {
                     var second = ParseFactor();
@@ -374,7 +437,7 @@ namespace Lab.Parser
                 }
                 else
                 {
-                    throw new SyntaxException($"Expected token at {ErrRow}:{ErrCol}", ErrRow, ErrCol);
+                    throw new SyntaxException($"Expected token at {errRow}:{errCol}", errRow, errCol);
                 }
             }
 
@@ -422,6 +485,20 @@ namespace Lab.Parser
                     _enumerator.Current.column,
                     _enumerator.Current.data);
             }
+			
+			if (MatchCurrentBool(TokenKind.NAME))
+			{
+				if (_base.IfVarExist(_enumerator.Current.data))
+				{
+					return new VarExpression(_enumerator.Current.row,
+						_enumerator.Current.column,
+						_enumerator.Current.data);
+				}
+                throw new SyntaxException($"Variable used before assignment " +
+                                          $"{_enumerator.Current.Kind.ToString()} " +
+                                          $"at {_enumerator.Current.row}:{_enumerator.Current.column}",
+                    _enumerator.Current.row, _enumerator.Current.column);
+			}
             throw new SyntaxException($"Unexpected token {_enumerator.Current.Kind.ToString()} at {_enumerator.Current.row}:{_enumerator.Current.column}",
                 _enumerator.Current.row, _enumerator.Current.column);
         }

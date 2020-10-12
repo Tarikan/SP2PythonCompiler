@@ -6,6 +6,7 @@ namespace Lab
     public class Ast
     {
         public readonly RootNode root;
+        public readonly Dictionary<string, int> varTable = new Dictionary<string, int>();
         
         public Ast(RootNode root)
         {
@@ -21,6 +22,39 @@ namespace Lab
         {
             return root;
         }
+
+        public bool IfVarExist(string v)
+        {
+            if (varTable.ContainsKey(v))
+            {
+                return true;
+            }
+
+            return false;
+        }
+		
+		public Dictionary<string, int> GetTable()
+		{
+			return varTable;
+		}
+
+        public int GetIndex(string s)
+        {
+            return varTable[s];
+        }
+
+        public int GetVarLen()
+        {
+            return varTable.Count;
+        }
+		
+		public void AddVar(string VarName)
+		{
+			if(!varTable.Keys.Contains(VarName))
+			{
+				varTable[VarName] = (varTable.Count + 1) * 4;
+			}
+		}
     }
 
     public class RootNode
