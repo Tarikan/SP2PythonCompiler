@@ -186,6 +186,11 @@ namespace Lab
             return $"{GenerateExpr(ret)}\npop eax\nret";
         }
 
+        private string GenerateCallExpression(CallExpression e)
+        {
+            return $"invoke {e.name}\npush eax";
+        }
+
         private string GenerateExpr(Expression e)
         {
             return e switch
@@ -194,6 +199,7 @@ namespace Lab
                 UnOp unop => GenerateUnExpr(unop),
                 ConstExpression constExpression => GenerateConstExpr(constExpression),
                 VarExpression varExpression => GenerateVarExpr(varExpression),
+                CallExpression callExpression => GenerateCallExpression(callExpression),
                 _ => throw new CompilerException(e.GetType().ToString(),  e.Row, e.Column)
             };
         }

@@ -488,6 +488,18 @@ namespace Lab.Parser
 			
 			if (MatchCurrentBool(TokenKind.NAME))
 			{
+                if (_enumerator.MoveNext() &&
+                    _enumerator.Current.Kind == TokenKind.LPAR)
+                {
+                    Match(TokenKind.RPAR);
+                    _enumerator.MovePrevious();
+                    _enumerator.MovePrevious();
+                    return new CallExpression(_enumerator.Current.row,
+                        _enumerator.Current.column,
+                        _enumerator.Current.data);
+                }
+
+                _enumerator.MovePrevious();
 				if (_base.IfVarExist(_enumerator.Current.data))
 				{
 					return new VarExpression(_enumerator.Current.row,
