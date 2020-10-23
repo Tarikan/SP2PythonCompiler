@@ -13,11 +13,12 @@ namespace Lab
         
         private List<Token> _tokens = new List<Token>();
 
-        private int _currentLevel = 0;
+        private int _currentLevel;
 
         public Lexer(string code)
         {
             _code = code;
+            _currentLevel = 0;
         }
 
         public void GetTokens()
@@ -35,18 +36,18 @@ namespace Lab
                         column = strings[i].Length
                     });
                 }
-                
-                while (_currentLevel > 0)
-                {
-                    _tokens.Add(new Token()
-                    {
-                        Kind = TokenKind.DEDENT,
-                        data = "",
-                        row = strings.Length + 1,
-                        column = 0
-                    });
-                    _currentLevel--;
-                }
+
+                // while (_currentLevel > 0)
+                // {
+                //     _tokens.Add(new Token()
+                //     {
+                //         Kind = TokenKind.DEDENT,
+                //         data = "",
+                //         row = strings.Length + 1,
+                //         column = 0
+                //     });
+                //     _currentLevel--;
+                // }
             }
         }
         
@@ -59,13 +60,16 @@ namespace Lab
             }
             
             var tabsC = CountTabs(str);
-            if (tabsC - _currentLevel > 1)
+            //Console.WriteLine(_currentLevel);
+            if (Math.Abs(tabsC - _currentLevel) > 1)
             {
                 throw new CompilerException($"Not expected indent at {row + 1}");
+                //_currentLevel++;
             }
-            else if (tabsC - _currentLevel == 1)
+            if (tabsC - _currentLevel == 1)
             {
                 _currentLevel = tabsC;
+                //Console.WriteLine(_currentLevel.ToString() + ' ' + row.ToString());
                 for (int i = 0; i < _currentLevel; i++)
                 {
                     _tokens.Add(new Token()
@@ -75,8 +79,7 @@ namespace Lab
                         row = row,
                         column = 0
                     });
-                }    
-                
+                }
             }
             else if (_currentLevel - tabsC > 0)
             {
@@ -424,6 +427,16 @@ namespace Lab
                 _tokens.Add(new Token()
                 {
                     Kind = TokenKind.IF,
+                    data = st.ToString(),
+                    row = row,
+                    column = col
+                });
+            }
+            else if (st.ToString().Equals("else"))
+            {
+                _tokens.Add(new Token()
+                {
+                    Kind = TokenKind.ELSE,
                     data = st.ToString(),
                     row = row,
                     column = col

@@ -41,6 +41,25 @@ namespace Lab.Parser
             Console.WriteLine(name);
         }
 	}
+
+    public class ConditionalExpression : Expression
+    {
+        public readonly Expression body;
+
+        public readonly Expression condition;
+        
+        public readonly Expression? elseBody;
+        public ConditionalExpression(int row, int col,
+            Expression body, Expression condition, Expression? elseBody) : base(row, col)
+        {
+            this.body = body;
+            this.condition = condition;
+            if (elseBody != null)
+            {
+                this.elseBody = elseBody;
+            }
+        }
+    }
 	
 	public class VarExpression : Expression
     {

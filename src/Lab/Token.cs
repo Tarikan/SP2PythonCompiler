@@ -6,11 +6,19 @@ namespace Lab
     {
         public override String ToString()
         {
-            //return this.Kind.ToString();
-            return $"Kind is {Kind.ToString()}\n" +
-                   $"data is {data.ToString()}\n" +
-                   $"row is {row.ToString()}\n" +
-                   $"column is {column.ToString()}\n";
+            if (data != null)
+            {
+                return $"Kind is {Kind.ToString()}\n" +
+                       $"data is {data.ToString()}\n" +
+                       $"row is {row.ToString()}\n" +
+                       $"column is {column.ToString()}\n";
+            }
+            else
+            {
+                return $"Kind is {Kind.ToString()}\n" +
+                       $"row is {row.ToString()}\n" +
+                       $"column is {column.ToString()}\n";
+            }
         }
 
         public TokenKind Kind { get; set; }

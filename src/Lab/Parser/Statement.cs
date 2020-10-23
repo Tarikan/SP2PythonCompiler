@@ -20,8 +20,33 @@ namespace Lab.Parser
             expr = e;
         }
 	}
-	
-	public class AssignStatement : Statement
+
+    public class ConditionalStatement : Statement
+    {
+        public Expression Condition { get; set; }
+
+        public ConditionalStatement(int row, int col,
+            Expression condition) : base(row, col)
+        {
+            Condition = condition;
+        }
+    }
+
+    public class ConditionalElseStatement : ConditionalStatement
+    {
+        public ConditionalElseStatement(int row, int col, Expression condition) : base(row, col, condition)
+        {
+        }
+    }
+
+    class BlockStatement : Statement
+    {
+        public BlockStatement(int row, int col) : base(row, col)
+        {
+        }
+    }
+
+    public class AssignStatement : Statement
 	{
 		public string VarName { get; set; }
 		
@@ -37,8 +62,7 @@ namespace Lab.Parser
     public class DefStatement : Statement
     {
         public List<Token> Args;
-
-        public List<Statement> Statements;
+        
         
 #nullable enable
         public Expression ?Return;
@@ -46,19 +70,7 @@ namespace Lab.Parser
 
         public DefStatement(int row, int col) : base(row, col)
         {
-            Statements = new List<Statement>();
-            
             Args = new List<Token>();
-        }
-
-        public void AddStatement(Statement st)
-        {
-            Statements.Add(st);
-        }
-
-        public List<Statement> GetStatements()
-        {
-            return Statements;
         }
     }
     
@@ -68,15 +80,6 @@ namespace Lab.Parser
         public CallStatement(int row, int col) : base(row, col)
         {
             Args = new List<Token>();
-        }
-    }
-    
-    public class ReturnStatement : Statement
-    {
-        private Token ReturnValue { get; set; }
-        
-        public ReturnStatement(int row, int col) : base(row, col)
-        {
         }
     }
 }

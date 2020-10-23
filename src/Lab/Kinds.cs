@@ -8,6 +8,7 @@ namespace Lab
         DEF,
         FOR,
         IF,
+        ELSE,
         INT,
         FLOAT,
         HEXNUM,

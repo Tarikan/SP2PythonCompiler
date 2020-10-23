@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 
 namespace Lab.Parser
 {
@@ -24,10 +25,11 @@ namespace Lab.Parser
 
             _enumerator = new TwoWayEnum<Token>(_tokens.GetEnumerator());
 
-            this.Parse();
+            //this.Parse();
+            ParseUntil(_base.root);
         }
 
-        private void Parse()
+        /*private void Parse()
         {
             while (_enumerator.MoveNext())
             {
@@ -72,6 +74,101 @@ namespace Lab.Parser
                     }
                 }
             }
+        }*/
+
+        private void ParseUntil(RootNode baseNode, TokenKind? cancellationToken = null)
+        {
+            while (_enumerator.MoveNext())
+            {
+                var token = _enumerator.Current;
+                if (token.Kind == cancellationToken)
+                {
+                    break;
+                }
+                switch (token.Kind)
+                {
+                    case TokenKind.DEF:
+                    {
+                        var temp = ParseDef();
+                        baseNode.AddChild(temp);
+                        break;
+                    }
+                    case TokenKind.NAME: {
+                        //Console.WriteLine(_enumerator.Current.data);
+                        if (_enumerator.MoveNext())
+                        {
+                            if (_enumerator.Current.Kind == TokenKind.EQUAL)
+                            {
+                                _enumerator.MovePrevious();
+                                var name = _enumerator.Current.data;
+                                _enumerator.MoveNext();
+                                _enumerator.MoveNext();
+                                var expr = ParseExpr();
+                                baseNode.AddChild(new AssignStatement(
+                                    _enumerator.Current.row,
+                                    _enumerator.Current.column,
+                                    name, expr));
+                                if (!_base.IfVarExist(name))
+                                {
+                                    _base.AddVar(name);
+                                }
+                            }
+                            else if (_enumerator.Current.Kind == TokenKind.LPAR)
+                            {
+                                _enumerator.MovePrevious();
+                                var temp = ParseName();
+                                baseNode.AddChild(temp);
+                                if (!_base.root.GetChildren()
+                                    .Any(def =>
+                                        def is DefStatement d &&
+                                        d.Name == temp.Name))
+                                {
+                                    throw new SyntaxException(
+                                        $"Name {temp.Name} is not defined at {temp.Row + 1}:{temp.Column}",
+                                        temp.Row, temp.Column);
+                                }
+                                this.MatchIndentation();
+                                break;
+                            }
+                            else
+                            {
+                                _enumerator.MovePrevious();
+                                baseNode.AddChild(new ExprStatement(
+                                    _enumerator.Current.row,
+                                    _enumerator.Current.column,
+                                    ParseExpr()));
+                                ;
+                            }
+                        }
+                        break;
+                    }
+                    case TokenKind.IF:
+                    {
+                        var temp = ParseConditional();
+                        baseNode.AddChild(temp);
+                        _enumerator.MovePrevious();
+                        break;
+                    }
+                    case TokenKind.INT:
+                    case TokenKind.MINUS:
+                    case TokenKind.TILDE:
+                    case TokenKind.EXCLAMINATION:
+                    case TokenKind.LPAR:
+                    {
+                        var temp = new ExprStatement(_enumerator.Current.row,
+                            _enumerator.Current.column,
+                            ParseExpr());
+                        //Console.WriteLine(temp.ToString());
+                        baseNode.AddChild(temp);
+                        MatchIndentationCurrent();
+                        break;
+                    }
+                    default:
+                    {
+                        break;
+                    }
+                }
+            }
         }
 		
 
@@ -88,11 +185,26 @@ namespace Lab.Parser
             }
             this.Match(TokenKind.COLON);
 
-            MatchDefBody(def);
+            //MatchDefBody(def);
+            if (MatchBool(TokenKind.NEWLINE))
+            {
+                ParseUntil(def, TokenKind.RETURN);
+                _enumerator.MovePrevious();
+                //_enumerator.MovePrevious();
+                def.Return = this.MatchReturn();
+                this.MatchCurrent(TokenKind.NEWLINE);
+                this.Match(TokenKind.DEDENT);
+            }
+            else
+            {
+                this.MatchCurrent(TokenKind.RETURN);
+                def.Return = ParseExpr();
+                MatchCurrent(TokenKind.NEWLINE);
+            }
             return def;
         }
 
-        private void MatchDefBody(DefStatement def)
+        /*private void MatchDefBody(DefStatement def)
         {
             if (this.MatchBool(TokenKind.NEWLINE))
             {
@@ -151,8 +263,8 @@ namespace Lab.Parser
                 this.MatchCurrent(TokenKind.RETURN);
                 def.Return = ParseExpr();
             }
-        }
-
+        }*/
+        
         private Statement ParseName()
         {
             var res = new CallStatement(_enumerator.Current.row, _enumerator.Current.column);
@@ -163,38 +275,49 @@ namespace Lab.Parser
             return res;
         }
 
-        
-        private static void Fail(int errId, Token token)
+        private Statement ParseConditional()
         {
-            string msg = "";
+            var rowCol = new
+            {
+                _enumerator.Current.row,
+                _enumerator.Current.column
+            };
+            if (!_enumerator.MoveNext()) {throw new SyntaxException("Token expected",
+                rowCol.row, rowCol.column);}
+            var condition = ParseExpr();
+            MatchCurrent(TokenKind.COLON);
+            var body = new BlockStatement(_enumerator.Current.row,
+                _enumerator.Current.column);
+            
+            if (!_enumerator.MoveNext()) throw new SyntaxException("Token expected",
+                _enumerator.Current.row, _enumerator.Current.column);
+            ParseUntil(body,
+                _enumerator.Current.Kind == TokenKind.NEWLINE ? TokenKind.DEDENT : TokenKind.NEWLINE);
 
-            switch (errId){
-            case 0: {
-                msg = "Incorrect tab count";
-                break;
+            if (MatchBool(TokenKind.ELSE))
+            {
+                var conditionalElseStatement = new ConditionalElseStatement(rowCol.row,
+                    rowCol.column,
+                    condition
+                );
+                var elseBody = new BlockStatement(_enumerator.Current.row,
+                    _enumerator.Current.column);
+                if (!_enumerator.MoveNext()) throw new SyntaxException("Token expected",
+                    _enumerator.Current.row, _enumerator.Current.column);
+                _enumerator.MoveNext();
+                ParseUntil(elseBody,
+                    _enumerator.Current.Kind == TokenKind.NEWLINE ? TokenKind.DEDENT : TokenKind.NEWLINE);
+                conditionalElseStatement.AddChild(body);
+                conditionalElseStatement.AddChild(elseBody);
+                return conditionalElseStatement;
             }
-            case 1: {
-                msg = "Incorrect type";
-                break;
-            }
-            case 2: {
-                msg = "Cannot cast to INT";
-                break;
-            }
-            case 3: {
-                msg = "Unexpected token";
-                break;
-            }
-            case 4: {
-                msg = "Unknown method call";
-                break;
-            }
-            default: msg = "Unknown error";
-                break;
-            }
-        throw new CompilerException(msg + $" at {token.row + 1}:{token.column}",
-            token.row, token.column);
-    }
+            var conditionalStatement = new ConditionalStatement(rowCol.row,
+                rowCol.column,
+                condition
+            );
+            conditionalStatement.AddChild(body);
+            return conditionalStatement;
+        }
 
         private Token Match(TokenKind l)
         {
@@ -389,6 +512,22 @@ namespace Lab.Parser
                     );
                 }
             }
+            
+            if (MatchCurrentBool(TokenKind.IF) && _enumerator.MoveNext())
+            {
+                var condition = ParseExpr();
+                
+                if (MatchCurrentBool(TokenKind.ELSE))
+                {
+                    _enumerator.MoveNext();
+                    var elseExpression = ParseExpr();
+                    return new ConditionalExpression(first.Row,
+                        first.Column,
+                        first,
+                        condition,
+                        elseExpression);
+                }
+            }
 
             if (MatchCurrentBool(TokenKind.LESS) ||
                 MatchCurrentBool(TokenKind.GREATER) ||
@@ -487,16 +626,17 @@ namespace Lab.Parser
             }
 			
 			if (MatchCurrentBool(TokenKind.NAME))
-			{
+            {
+                var name = _enumerator.Current.data;
                 if (_enumerator.MoveNext() &&
                     _enumerator.Current.Kind == TokenKind.LPAR)
                 {
                     Match(TokenKind.RPAR);
-                    _enumerator.MovePrevious();
-                    _enumerator.MovePrevious();
+                    //_enumerator.MovePrevious();
+                    //_enumerator.MovePrevious();
                     return new CallExpression(_enumerator.Current.row,
                         _enumerator.Current.column,
-                        _enumerator.Current.data);
+                        name);
                 }
 
                 _enumerator.MovePrevious();
@@ -504,7 +644,7 @@ namespace Lab.Parser
 				{
 					return new VarExpression(_enumerator.Current.row,
 						_enumerator.Current.column,
-						_enumerator.Current.data);
+						name);
 				}
                 throw new SyntaxException($"Variable used before assignment " +
                                           $"{_enumerator.Current.Kind.ToString()} " +
