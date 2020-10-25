@@ -69,17 +69,24 @@ namespace Lab
             if (tabsC - _currentLevel == 1)
             {
                 _currentLevel = tabsC;
-                //Console.WriteLine(_currentLevel.ToString() + ' ' + row.ToString());
-                for (int i = 0; i < _currentLevel; i++)
+                _tokens.Add(new Token()
                 {
-                    _tokens.Add(new Token()
-                    {
-                        Kind = TokenKind.INDENT,
-                        data = "\t",
-                        row = row,
-                        column = 0
-                    });
-                }
+                    Kind = TokenKind.INDENT,
+                    data = "\t",
+                    row = row,
+                    column = 0
+                });
+                //Console.WriteLine(_currentLevel.ToString() + ' ' + row.ToString());
+                // for (int i = 0; i < _currentLevel; i++)
+                // {
+                //     _tokens.Add(new Token()
+                //     {
+                //         Kind = TokenKind.INDENT,
+                //         data = "\t",
+                //         row = row,
+                //         column = 0
+                //     });
+                // }
             }
             else if (_currentLevel - tabsC > 0)
             {

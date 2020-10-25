@@ -286,11 +286,15 @@ namespace Lab.Parser
                 rowCol.row, rowCol.column);}
             var condition = ParseExpr();
             MatchCurrent(TokenKind.COLON);
+            
             var body = new BlockStatement(_enumerator.Current.row,
                 _enumerator.Current.column);
             
             if (!_enumerator.MoveNext()) throw new SyntaxException("Token expected",
                 _enumerator.Current.row, _enumerator.Current.column);
+            
+            Match(TokenKind.INDENT);
+            _enumerator.MovePrevious();
             ParseUntil(body,
                 _enumerator.Current.Kind == TokenKind.NEWLINE ? TokenKind.DEDENT : TokenKind.NEWLINE);
 
@@ -305,6 +309,8 @@ namespace Lab.Parser
                 if (!_enumerator.MoveNext()) throw new SyntaxException("Token expected",
                     _enumerator.Current.row, _enumerator.Current.column);
                 _enumerator.MoveNext();
+                Match(TokenKind.INDENT);
+                _enumerator.MovePrevious();
                 ParseUntil(elseBody,
                     _enumerator.Current.Kind == TokenKind.NEWLINE ? TokenKind.DEDENT : TokenKind.NEWLINE);
                 conditionalElseStatement.AddChild(body);
@@ -516,17 +522,15 @@ namespace Lab.Parser
             if (MatchCurrentBool(TokenKind.IF) && _enumerator.MoveNext())
             {
                 var condition = ParseExpr();
-                
-                if (MatchCurrentBool(TokenKind.ELSE))
-                {
-                    _enumerator.MoveNext();
-                    var elseExpression = ParseExpr();
-                    return new ConditionalExpression(first.Row,
-                        first.Column,
-                        first,
-                        condition,
-                        elseExpression);
-                }
+
+                MatchCurrent(TokenKind.ELSE);
+                _enumerator.MoveNext();
+                var elseExpression = ParseExpr();
+                return new ConditionalExpression(first.Row,
+                    first.Column,
+                    first,
+                    condition,
+                    elseExpression);
             }
 
             if (MatchCurrentBool(TokenKind.LESS) ||
