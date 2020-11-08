@@ -1,13 +1,14 @@
 using System.Collections.Generic;
 using System.Linq;
+using Lab.Interfaces;
 
 namespace Lab
 {
-    public class Ast
+    public class Ast : IVariableTableContainer
     {
         public readonly RootNode root;
-        public readonly Dictionary<string, int> varTable = new Dictionary<string, int>();
-        
+        public Dictionary<string, int> varTable { get; set;} = new Dictionary<string, int>();
+
         public Ast(RootNode root)
         {
             this.root = root;
@@ -23,7 +24,7 @@ namespace Lab
             return root;
         }
 
-        public bool IfVarExist(string v)
+        public bool HaveVariable(string v)
         {
             if (varTable.ContainsKey(v))
             {
@@ -38,7 +39,7 @@ namespace Lab
 			return varTable;
 		}
 
-        public int GetIndex(string s)
+        public int GetVarIndex(string s)
         {
             return varTable[s];
         }
@@ -48,11 +49,11 @@ namespace Lab
             return varTable.Count;
         }
 		
-		public void AddVar(string VarName)
+		public void AddVar(string varName)
 		{
-			if(!varTable.Keys.Contains(VarName))
+			if(!varTable.Keys.Contains(varName))
 			{
-				varTable[VarName] = (varTable.Count + 1) * 4;
+				varTable[varName] = (varTable.Count + 1) * 4;
 			}
 		}
     }

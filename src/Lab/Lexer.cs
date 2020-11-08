@@ -291,7 +291,7 @@ namespace Lab
             var pos = col;
             while (pos < str.Length)
             {
-                if (Char.IsSymbol(str[pos]))
+                if (Kinds.Symbols.Contains(str[pos]))
                 {
                     st.Append(str[pos]);
                     pos++;

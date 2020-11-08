@@ -2,3 +2,5 @@
 /src/Lab/bin/
 /src/Lab/obj/
 /.idea/
+**/bin/
+**/obj/

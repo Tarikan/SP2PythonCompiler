@@ -11,16 +11,18 @@ namespace Lab
         public const string PublishPath = "";
         
         public static readonly string Code = System.IO.File.ReadAllText(PublishPath + 
-                                                                        "3-8-CSHARP-IO-81-Ivanyshyn.txt");
+                                                                        "5-8-CSHARP-IO-81-Ivanyshyn.txt");
 
         static void Main(string[] args)
         {
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             Console.WriteLine("C# compiler for python by Taras Ivanyshyn\n" +
-                              "Lab4");
+                              "Lab5");
 
+            //Console.WriteLine(Code);
 
+            
             Lexer l = new Lexer(Code);
             
             l.GetTokens();

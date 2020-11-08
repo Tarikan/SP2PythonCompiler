@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
+using Lab.Interfaces;
 
 namespace Lab.Parser
 {
@@ -13,7 +14,9 @@ namespace Lab.Parser
 
         private readonly TwoWayEnum<Token> _enumerator;
         
-        private readonly Ast _base; 
+        private readonly Ast _base;
+
+        private IVariableTableContainer _currentNameSpace;
 
         public Parser(List<Token> tokens)
         {
@@ -25,7 +28,8 @@ namespace Lab.Parser
 
             _enumerator = new TwoWayEnum<Token>(_tokens.GetEnumerator());
 
-            //this.Parse();
+            _currentNameSpace = _base;
+            
             ParseUntil(_base.root);
         }
 
@@ -76,12 +80,12 @@ namespace Lab.Parser
             }
         }*/
 
-        private void ParseUntil(RootNode baseNode, TokenKind? cancellationToken = null)
+        private void ParseUntil(RootNode baseNode, TokenKind? stopToken = null)
         {
             while (_enumerator.MoveNext())
             {
                 var token = _enumerator.Current;
-                if (token.Kind == cancellationToken)
+                if (token.Kind == stopToken)
                 {
                     break;
                 }
@@ -89,7 +93,20 @@ namespace Lab.Parser
                 {
                     case TokenKind.DEF:
                     {
-                        var temp = ParseDef();
+                        DefStatement temp = null;
+                        switch (baseNode)
+                        {
+                            case IVariableTableContainer tableContainer:
+                            {
+                                temp = ParseDef(new Dictionary<string, int>(tableContainer.varTable));
+                                break;
+                            }
+                            default:
+                            {
+                                temp = ParseDef(new Dictionary<string, int>(_base.varTable));
+                                break;
+                            }
+                        }
                         baseNode.AddChild(temp);
                         break;
                     }
@@ -108,9 +125,75 @@ namespace Lab.Parser
                                     _enumerator.Current.row,
                                     _enumerator.Current.column,
                                     name, expr));
-                                if (!_base.IfVarExist(name))
+                                switch (baseNode)
                                 {
-                                    _base.AddVar(name);
+                                    case IVariableTableContainer tableContainer:
+                                    {
+                                        tableContainer.AddVar(name);
+                                        break;
+                                    }
+                                    default:
+                                    {
+                                        _currentNameSpace.AddVar(name);
+                                        break;
+                                    }
+                                }
+                            }
+                            else if (_enumerator.Current.Kind == TokenKind.PLUSEQUAL ||
+                                     _enumerator.Current.Kind == TokenKind.MINEQUAL ||
+                                     _enumerator.Current.Kind == TokenKind.STAREQUAL ||
+                                     _enumerator.Current.Kind == TokenKind.SLASHEQUAL)
+                            {
+                                _enumerator.MovePrevious();
+                                var name = _enumerator.Current.data;
+                                var row = _enumerator.Current.row;
+                                var col = _enumerator.Current.column;
+                                switch (baseNode)
+                                {
+                                    case IVariableTableContainer tableContainer:
+                                    {
+                                        if (!tableContainer.HaveVariable(name))
+                                        {
+                                            throw new CompilerException(
+                                                $"Name {name} is not defined at {_enumerator.Current.row}:{_enumerator.Current.column}",
+                                                _enumerator.Current.row, _enumerator.Current.column);
+                                        }
+                                        break;
+                                    }
+                                    default:
+                                    {
+                                        if (!_currentNameSpace.HaveVariable(name))
+                                        {
+                                            throw new CompilerException(
+                                                $"Name {name} is not defined at {_enumerator.Current.row}:{_enumerator.Current.column}",
+                                                _enumerator.Current.row, _enumerator.Current.column);
+                                        }
+                                        break;
+                                    }
+                                }
+                                _enumerator.MoveNext();
+                                //var op = _enumerator.Current.Kind;
+                                var op = _enumerator.Current.Kind switch
+                                {
+                                    TokenKind.PLUSEQUAL => TokenKind.PLUS,
+                                    TokenKind.MINEQUAL => TokenKind.MINUS,
+                                    TokenKind.STAREQUAL => TokenKind.STAR,
+                                    TokenKind.SLASHEQUAL => TokenKind.SLASH
+                                };
+                                if (_enumerator.MoveNext())
+                                {
+                                    baseNode.AddChild(new AssignStatement(
+                                        _enumerator.Current.row,
+                                        _enumerator.Current.column,
+                                        name,
+                                        new BinOp(_enumerator.Current.row,
+                                            _enumerator.Current.column,
+                                            op,
+                                            new VarExpression(row,
+                                                col,
+                                                name),
+                                            ParseExpr()
+                                            )));
                                 }
                             }
                             else if (_enumerator.Current.Kind == TokenKind.LPAR)
@@ -172,28 +255,40 @@ namespace Lab.Parser
         }
 		
 
-        private DefStatement ParseDef()
+        private DefStatement ParseDef(Dictionary<string, int> varTable)
         {
-            var def = new DefStatement(_enumerator.Current.row, _enumerator.Current.column)
+            //Console.WriteLine(string.Join(", ", varTable.Keys));
+            var def = new DefStatement(_enumerator.Current.row, _enumerator.Current.column, varTable)
             {
-                Name = this.Match(TokenKind.NAME).data, Args = this.MatchArgs()
+                Name = this.Match(TokenKind.NAME).data,
+                Args = this.MatchDefArgs()
             };
-
+            //def.Args.Reverse();
             foreach (var arg in def.Args)
             {
-                Console.WriteLine(arg);
+                def.AddVar(arg);
             }
+            
             this.Match(TokenKind.COLON);
 
-            //MatchDefBody(def);
             if (MatchBool(TokenKind.NEWLINE))
             {
+                var prevNameSpace = _currentNameSpace;
+                _currentNameSpace = def;
                 ParseUntil(def, TokenKind.RETURN);
+                //Console.WriteLine(string.Join(", ", def.varTable.Keys.ToList()));
+                //Console.WriteLine(string.Join(", ", _base.varTable.ToList()));
                 _enumerator.MovePrevious();
                 //_enumerator.MovePrevious();
                 def.Return = this.MatchReturn();
                 this.MatchCurrent(TokenKind.NEWLINE);
                 this.Match(TokenKind.DEDENT);
+                Console.WriteLine(def.Name);
+                // foreach (var kvp in def.varTable)
+                // {
+                //     Console.WriteLine($"{kvp.Key.ToString()} : {kvp.Value.ToString()}");
+                // }
+                _currentNameSpace = prevNameSpace;
             }
             else
             {
@@ -204,73 +299,14 @@ namespace Lab.Parser
             return def;
         }
 
-        /*private void MatchDefBody(DefStatement def)
-        {
-            if (this.MatchBool(TokenKind.NEWLINE))
-            {
-                this.Match(TokenKind.INDENT);
-                var move = true;
-				while (_enumerator.MoveNext() && move)
-				{
-					var token = _enumerator.Current;
-					switch (token.Kind){
-						case TokenKind.NAME: {
-                            if (_enumerator.MoveNext())
-                            {
-                                if (_enumerator.Current.Kind == TokenKind.EQUAL)
-                                {
-                                    _enumerator.MovePrevious();
-                                    var name = _enumerator.Current.data;
-                                    _enumerator.MoveNext();
-                                    _enumerator.MoveNext();
-                                    var expr = ParseExpr();
-                                    def.AddStatement(new AssignStatement(
-                                        _enumerator.Current.row,
-                                        _enumerator.Current.column,
-                                        name, expr));
-                                    if (!_base.IfVarExist(name))
-                                    {
-                                        _base.AddVar(name);
-                                    }
-                                }
-                                else
-                                {
-                                    _enumerator.MovePrevious();
-                                    def.AddStatement(new ExprStatement(
-                                        _enumerator.Current.row,
-                                        _enumerator.Current.column,
-                                        ParseExpr()));
-                                   ;
-                                }
-                            }
-							break;
-                        }
-                        case TokenKind.RETURN:
-                        {
-                            _enumerator.MovePrevious();
-                            _enumerator.MovePrevious();
-                            move = false;
-                            break;
-                        }
-                    }
-				}
-                def.Return = this.MatchReturn();
-                this.MatchCurrent(TokenKind.NEWLINE);
-                this.Match(TokenKind.DEDENT);
-            }
-            else
-            {
-                this.MatchCurrent(TokenKind.RETURN);
-                def.Return = ParseExpr();
-            }
-        }*/
-        
         private Statement ParseName()
         {
-            var res = new CallStatement(_enumerator.Current.row, _enumerator.Current.column);
-            res.Name = _enumerator.Current.data;
+            var res = new CallStatement(_enumerator.Current.row, _enumerator.Current.column)
+            {
+                Name = _enumerator.Current.data,
+                Args = this.MatchArgs()
+            };
 
-            res.Args = this.MatchArgs();
 
             return res;
         }
@@ -334,7 +370,7 @@ namespace Lab.Parser
                 {
                     //Console.WriteLine(_enumerator.Current.Kind.ToString());
                     throw new SyntaxException("Got " + _enumerator.Current.Kind.ToString() + $", {l.ToString()} expected" +
-                                              $" at {_enumerator.Current.row}:{_enumerator.Current.column}",
+                                              $" at {_enumerator.Current.row + 1}:{_enumerator.Current.column + 1}",
                         _enumerator.Current.row, _enumerator.Current.column);
                 }
                 else
@@ -459,16 +495,56 @@ namespace Lab.Parser
                 ErrRow, ErrCol);
         }
 
-        private List<Token> MatchArgs()
+        private List<Expression> MatchArgs()
         {
-            var res = new List<Token>();
+            var res = new List<Expression>();
             this.Match(TokenKind.LPAR);
             while (_enumerator.MoveNext())
             {
                 switch (_enumerator.Current.Kind)
                 {
                     case TokenKind.NAME:
-                        res.Add(_enumerator.Current);
+                    case TokenKind.INT:
+                    case TokenKind.FLOAT:
+                        res.Add(ParseExpr());
+                        //_enumerator.MoveNext();
+                        switch (_enumerator.Current.Kind)
+                        {
+                            case TokenKind.COMMA:
+                                break;
+                            case TokenKind.RPAR:
+                                return res;
+                            default:
+                                throw new SyntaxException(
+                                    $"Unexpected token {_enumerator.Current.Kind.ToString()} at {_enumerator.Current.row + 1}:{_enumerator.Current.column}",
+                                    _enumerator.Current.row, _enumerator.Current.column
+                                    );
+                        }
+                        break;
+                    case TokenKind.RPAR:
+                        return res;
+                    default:
+                        throw new SyntaxException(
+                            $"Unexpected token {_enumerator.Current.Kind.ToString()} at {_enumerator.Current.row + 1}:{_enumerator.Current.column}",
+                            _enumerator.Current.row, _enumerator.Current.column
+                        );
+                }
+            }
+
+            return res;
+        }
+
+        private List<string> MatchDefArgs()
+        {
+            var res = new List<string>();
+            this.Match(TokenKind.LPAR);
+            while (_enumerator.MoveNext())
+            {
+                switch (_enumerator.Current.Kind)
+                {
+                    case TokenKind.NAME:
+                        res.Add(_enumerator.Current.data);
+                        //Console.WriteLine(res[^1].ToString());
                         _enumerator.MoveNext();
                         switch (_enumerator.Current.Kind)
                         {
@@ -480,7 +556,7 @@ namespace Lab.Parser
                                 throw new SyntaxException(
                                     $"Unexpected token at {_enumerator.Current.row + 1}:{_enumerator.Current.column}",
                                     _enumerator.Current.row, _enumerator.Current.column
-                                    );
+                                );
                         }
                         break;
                     case TokenKind.RPAR:
@@ -644,14 +720,14 @@ namespace Lab.Parser
                 }
 
                 _enumerator.MovePrevious();
-				if (_base.IfVarExist(_enumerator.Current.data))
+				if (_currentNameSpace.HaveVariable(_enumerator.Current.data))
 				{
 					return new VarExpression(_enumerator.Current.row,
 						_enumerator.Current.column,
 						name);
 				}
                 throw new SyntaxException($"Variable used before assignment " +
-                                          $"{_enumerator.Current.Kind.ToString()} " +
+                                          $"\"{_enumerator.Current.data.ToString()}\" " +
                                           $"at {_enumerator.Current.row}:{_enumerator.Current.column}",
                     _enumerator.Current.row, _enumerator.Current.column);
 			}
@@ -663,6 +739,5 @@ namespace Lab.Parser
         {
             return _base;
         }
-
     }
 }

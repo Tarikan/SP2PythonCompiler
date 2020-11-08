@@ -1,4 +1,6 @@
 using System.Collections.Generic;
+using System.Linq;
+using Lab.Interfaces;
 
 namespace Lab.Parser
 {
@@ -59,10 +61,11 @@ namespace Lab.Parser
         }
 	}
     
-    public class DefStatement : Statement
+    public class DefStatement : Statement, IVariableTableContainer
     {
-        public List<Token> Args;
-        
+        public List<string> Args;
+
+        public Dictionary<string, int> varTable { get; set; }
         
 #nullable enable
         public Expression ?Return;
@@ -70,16 +73,67 @@ namespace Lab.Parser
 
         public DefStatement(int row, int col) : base(row, col)
         {
-            Args = new List<Token>();
+            Args = new List<string>();
+            this.varTable = new Dictionary<string, int>();
+        }
+        
+        public DefStatement(int row, int col, Dictionary<string, int> varTable) : base(row, col)
+        {
+            Args = new List<string>();
+            this.varTable = varTable;
+        }
+        
+        public DefStatement(int row, int col, List<string> args) : base(row, col)
+        {
+            Args = args;
+            this.varTable = new Dictionary<string, int>();
+        }
+        
+        public bool HaveVariable(string v)
+        {
+            if (varTable.ContainsKey(v))
+            {
+                return true;
+            }
+
+            return false;
+        }
+
+        public int GetVarIndex(string s)
+        {
+            return varTable[s];
+        }
+
+        public int GetVarLen()
+        {
+            return varTable.Count;
+        }
+
+        public void AddVar(string varName)
+        {
+            if (!varTable.ContainsKey(varName))
+            {
+                MoveIndexes();
+                varTable[varName] = 4;
+            }
+        }
+
+        private void MoveIndexes(int value = 4)
+        {
+            var indexes = varTable.Keys.ToList();
+            foreach (var index in indexes)
+            {
+                varTable[index] += 4;
+            }
         }
     }
     
     public class CallStatement : Statement
     {
-        public List<Token> Args;
+        public List<Expression> Args;
         public CallStatement(int row, int col) : base(row, col)
         {
-            Args = new List<Token>();
+            Args = new List<Expression>();
         }
     }
 }

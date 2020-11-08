@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text;
+using Lab.Interfaces;
 using Lab.Parser;
 
 namespace Lab
@@ -10,6 +11,8 @@ namespace Lab
     public class AsmGenerator
     {
         private readonly Ast _base;
+
+        private IVariableTableContainer _currentNameSpace;
 
         private List<string> _functionProtoNames;
     
@@ -22,9 +25,9 @@ namespace Lab
         
         private static readonly Dictionary<Type, string> TemplateDict = new Dictionary<Type, string>()
         {
-            {typeof(CallStatement), "\tcall {0}\n"},
+            {typeof(CallStatement), "call {0}\n"},
             {typeof(AssignStatement), "{0}\n\tpop eax\n\tmov dword ptr[ebp-{1}], eax\n"},
-            {typeof(ExprStatement), "\t{0}\n"},
+            {typeof(ExprStatement), "{0}\n"},
             {typeof(ConditionalElseStatement), "{0}" +
                                            "pop eax\n" +
                                            "cmp eax, 0\n" +
@@ -77,6 +80,7 @@ namespace Lab
             _functions = new List<string>();
             _statements = new List<string>();
             _functionProtoNames = new List<string>();
+            _currentNameSpace = Base;
         }
 
         public void GenerateAsm()
@@ -85,7 +89,7 @@ namespace Lab
             GetCalls();
 
             using (FileStream fs = File.Create(
-                "3-8-CSHARP-IO-81-Ivanyshyn.asm"))
+                "5-8-CSHARP-IO-81-Ivanyshyn.asm"))
             {
                 byte[] info = new UTF8Encoding(true).GetBytes(
                     string.Format(_templateMasm, string.Join("", _functionProtoNames.ToArray()),
@@ -98,22 +102,25 @@ namespace Lab
 
         private void GetFunctions()
         {
-            foreach (DefStatement defStatement in _base.root.GetChildren().Where(
+            var oldNameSpace = _currentNameSpace;
+            foreach (var astNode in _base.root.GetChildren().Where(
                 obj => obj.GetType() == typeof(DefStatement)))
             {
-                var Bodystatements = new StringBuilder();
+                _currentNameSpace = (DefStatement)astNode;
+                var defStatement = (DefStatement) astNode;
+                var bodystatements = new StringBuilder();
                 foreach (var statement in defStatement.GetChildren())
                 {
                     //Console.WriteLine(statement.GetType() + statement.Row.ToString() + ':' + statement.Column.ToString());
-                    Bodystatements.Append(GenerateCode(statement));
-                    Bodystatements.Append('\n');
+                    bodystatements.Append(GenerateCode(statement));
+                    bodystatements.Append('\n');
                 }
                 
-                Bodystatements.Append(GenerateReturn(defStatement.Return));
+                bodystatements.Append(GenerateReturn(defStatement.Return));
 
                 _functionProtoNames.Add(string.Format(ProtoTemplate, defStatement.Name));
                 
-                _functions.Add(string.Format(ProcTemplate, defStatement.Name, Bodystatements.ToString()));
+                _functions.Add(string.Format(ProcTemplate, defStatement.Name, bodystatements.ToString()));
             }
         }
 
@@ -193,7 +200,7 @@ namespace Lab
 
         private string GenerateVarExpr(VarExpression e)
         {
-            return $"mov eax, dword ptr[ebp - {_base.GetIndex(e.varName)}]\n" +
+            return $"mov eax, dword ptr[ebp - {_base.GetVarIndex(e.varName)}]\n" +
                    $"push eax\n";
         }
 
@@ -276,7 +283,7 @@ namespace Lab
                 AssignStatement assignStatement =>
                     string.Format(TemplateDict[assignStatement.GetType()],
                         GenerateExpr(assignStatement.VarExpr),
-                        (_base.GetIndex(assignStatement.VarName)).ToString()),
+                        (_base.GetVarIndex(assignStatement.VarName)).ToString()),
                 ExprStatement exprStatement =>
                     string.Format(TemplateDict[exprStatement.GetType()],
                         GenerateExpr(exprStatement.expr)),
