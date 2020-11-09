@@ -54,7 +54,8 @@ namespace Lab
         private bool ParseLine(string str, int row)
         {
             if (str.Length != 0 &&
-                str[0].Equals('#'))
+                str[0].Equals('#') ||
+                str.All(s => s == '\t'))
             {
                 return false;
             }

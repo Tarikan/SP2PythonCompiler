@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lab.Interfaces;
@@ -66,7 +67,11 @@ namespace Lab.Parser
         public List<string> Args;
 
         public Dictionary<string, int> varTable { get; set; }
+
+        public List<DefStatement> FuncList { get; set; }
         
+        public int VarCounter { get; set; }
+
 #nullable enable
         public Expression ?Return;
 #nullable disable
@@ -75,18 +80,36 @@ namespace Lab.Parser
         {
             Args = new List<string>();
             this.varTable = new Dictionary<string, int>();
+            FuncList = new List<DefStatement>();
         }
         
         public DefStatement(int row, int col, Dictionary<string, int> varTable) : base(row, col)
         {
             Args = new List<string>();
             this.varTable = varTable;
+            FuncList = new List<DefStatement>();
         }
         
         public DefStatement(int row, int col, List<string> args) : base(row, col)
         {
             Args = args;
             this.varTable = new Dictionary<string, int>();
+            FuncList = new List<DefStatement>();
+        }
+        
+        public bool HaveFunction(string f)
+        {
+            return FuncList.Find(func => func.Name == f) != null;
+        }
+
+        public void AddFunction(DefStatement f)
+        {
+            FuncList.Add(f);
+        }
+        
+        public DefStatement GetFunctionWithName(string f)
+        {
+            return FuncList.Find(func => func.Name == f) ?? throw new NullReferenceException();
         }
         
         public bool HaveVariable(string v)
@@ -109,10 +132,16 @@ namespace Lab.Parser
             return varTable.Count;
         }
 
+        public void AddArg(string argName)
+        {
+            varTable[argName] = -(varTable.Count(vt => vt.Value < 0) + 2) * 4;
+        }
+
         public void AddVar(string varName)
         {
             if (!varTable.ContainsKey(varName))
             {
+                VarCounter++;
                 MoveIndexes();
                 varTable[varName] = 4;
             }
@@ -123,7 +152,8 @@ namespace Lab.Parser
             var indexes = varTable.Keys.ToList();
             foreach (var index in indexes)
             {
-                varTable[index] += 4;
+                if (varTable[index] > 0) varTable[index] += 4;
+                else varTable[index] -= 4;
             }
         }
     }

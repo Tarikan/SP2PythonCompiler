@@ -1,6 +1,8 @@
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using Lab.Interfaces;
+using Lab.Parser;
 
 namespace Lab
 {
@@ -9,14 +11,18 @@ namespace Lab
         public readonly RootNode root;
         public Dictionary<string, int> varTable { get; set;} = new Dictionary<string, int>();
 
+        public List<DefStatement> FuncList { get; set; }
+
         public Ast(RootNode root)
         {
             this.root = root;
+            FuncList = new List<DefStatement>();
         }
 
         public Ast()
         {
             root = new RootNode();
+            FuncList = new List<DefStatement>();
         }
 
         public RootNode GetRoot()
@@ -33,8 +39,23 @@ namespace Lab
 
             return false;
         }
-		
-		public Dictionary<string, int> GetTable()
+
+        public bool HaveFunction(string f)
+        {
+            return FuncList.Find(func => func.Name == f) != null;
+        }
+
+        public void AddFunction(DefStatement f)
+        {
+            FuncList.Add(f);
+        }
+
+        public DefStatement GetFunctionWithName(string f)
+        {
+            return FuncList.Find(func => func.Name == f) ?? throw new NullReferenceException();
+        }
+
+        public Dictionary<string, int> GetTable()
 		{
 			return varTable;
 		}

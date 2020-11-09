@@ -26,7 +26,7 @@ namespace Lab
         private static readonly Dictionary<Type, string> TemplateDict = new Dictionary<Type, string>()
         {
             {typeof(CallStatement), "call {0}\n"},
-            {typeof(AssignStatement), "{0}\n\tpop eax\n\tmov dword ptr[ebp-{1}], eax\n"},
+            {typeof(AssignStatement), "{0}\n\tpop eax\n\tmov dword ptr[ebp{1}], eax\n"},
             {typeof(ExprStatement), "{0}\n"},
             {typeof(ConditionalElseStatement), "{0}" +
                                            "pop eax\n" +
@@ -60,16 +60,19 @@ namespace Lab
                                       ".data\n" +
                                       ".code\n" +
                                       "_start:\n" +
-                                      "\tinvoke  _main\n" +
+                                      "push ebp\n" + 
+                                      "mov ebp, esp\n" +
+                                      "sub ebp, {3}\n"+
+                                      "invoke  _main\n" +
+                                      "add ebp, {3}\n"+
+                                      "mov esp, ebp\n" +
+                                      "pop ebp\n" +
+                                      "ret\n" +
                                       "_main PROC\n\n" +
-                                      "\tpush ebp\n" + 
-                                      "\tmov ebp, esp\n" +
-                                      "\tsub ebp, {3}\n"+
+                                      "\n" +
                                       "{1}" + // insert code
-                                      "\tadd ebp, {3}\n"+
-                                      "\tmov esp, ebp\n" +
-                                      "\tpop ebp\n" +
-                                      "\n\tret\n\n" +
+                                      "\n" +
+                                      "\nret\n\n" +
                                       "_main ENDP\n\n" +
                                       "{2}" + // insert functions
                                       "END _start\n";
@@ -85,8 +88,10 @@ namespace Lab
 
         public void GenerateAsm()
         {
-            GetFunctions();
-            GetCalls();
+            foreach (var child in _base.root.GetChildren())
+            {
+                _statements.Add(GenerateCode(child));
+            }
 
             using (FileStream fs = File.Create(
                 "5-8-CSHARP-IO-81-Ivanyshyn.asm"))
@@ -95,33 +100,44 @@ namespace Lab
                     string.Format(_templateMasm, string.Join("", _functionProtoNames.ToArray()),
                     string.Join("", _statements.ToArray()),
                     string.Join("", _functions.ToArray()),
-                    (_base.GetVarLen() * 4).ToString()));
+                    (_currentNameSpace.GetVarLen() * 4).ToString()));
                 fs.Write(info, 0, info.Length);
             }
         }
 
-        private void GetFunctions()
+        private string GenerateFunction(DefStatement defStatement)
         {
             var oldNameSpace = _currentNameSpace;
-            foreach (var astNode in _base.root.GetChildren().Where(
-                obj => obj.GetType() == typeof(DefStatement)))
+            _currentNameSpace = defStatement;
+            var bodystatements = new StringBuilder();
+            if (defStatement.VarCounter != 0)
             {
-                _currentNameSpace = (DefStatement)astNode;
-                var defStatement = (DefStatement) astNode;
-                var bodystatements = new StringBuilder();
-                foreach (var statement in defStatement.GetChildren())
-                {
-                    //Console.WriteLine(statement.GetType() + statement.Row.ToString() + ':' + statement.Column.ToString());
-                    bodystatements.Append(GenerateCode(statement));
-                    bodystatements.Append('\n');
-                }
-                
-                bodystatements.Append(GenerateReturn(defStatement.Return));
-
-                _functionProtoNames.Add(string.Format(ProtoTemplate, defStatement.Name));
-                
-                _functions.Add(string.Format(ProcTemplate, defStatement.Name, bodystatements.ToString()));
+                bodystatements.Append($"push ebp\nmov ebp, esp\nsub ebp, {defStatement.VarCounter * 4}\n");
             }
+            
+            foreach (var statement in defStatement.GetChildren())
+            {
+                //Console.WriteLine(statement.GetType() + statement.Row.ToString() + ':' + statement.Column.ToString());
+                bodystatements.Append(GenerateCode(statement));
+                bodystatements.Append('\n');
+            }
+
+            if (defStatement.Return != null)
+            {
+                bodystatements.Append(GenerateReturn(defStatement.Return));
+            }
+            if (defStatement.VarCounter != 0)
+            {
+                bodystatements.Append($"add ebp, {defStatement.VarCounter * 4}\nmov esp, ebp\npop ebp\n");
+            }
+
+            bodystatements.Append($"ret {defStatement.Args.Count * 4}\n");
+            
+            _currentNameSpace = oldNameSpace;
+            _functionProtoNames.Add(string.Format(ProtoTemplate, defStatement.Name));
+                
+            _functions.Add(string.Format(ProcTemplate, defStatement.Name, bodystatements.ToString()));
+            return "\n";
         }
 
         private string GenerateBinExpr(BinOp e)
@@ -139,7 +155,7 @@ namespace Lab
             }
             else if (e.Op == TokenKind.STAR)
             {
-                code = $"{b}\n{a}\npop eax\npop ecx\nimul ecx\npush edx\n";
+                code = $"{b}\n{a}\npop eax\npop ecx\nimul ecx\npush eax\n";
             }
             else if (e.Op == TokenKind.SLASH)
             {
@@ -200,18 +216,29 @@ namespace Lab
 
         private string GenerateVarExpr(VarExpression e)
         {
-            return $"mov eax, dword ptr[ebp - {_base.GetVarIndex(e.varName)}]\n" +
+            return $"mov eax, dword ptr[ebp{GetVarOffset(e.varName)}] ; {e.varName}\n" +
                    $"push eax\n";
         }
 
         private string GenerateReturn(Expression ret)
         {
-            return $"{GenerateExpr(ret)}\npop eax\nret\n";
+            return $"{GenerateExpr(ret)}\npop eax\n";
         }
 
         private string GenerateCallExpression(CallExpression e)
         {
-            return $"invoke {e.name}\npush eax\n";
+            var st = new StringBuilder();
+            e.Args.Reverse();
+            if (e.Args.Count > 0)
+            {
+                foreach (var arg in e.Args)
+                {
+                    st.Append(GenerateExpr(arg));
+                }
+            }
+
+            st.Append($"invoke {e.name}\n push eax\n");
+            return st.ToString();
         }
 
         private string GenerateConditionalExpression(ConditionalExpression e)
@@ -244,28 +271,29 @@ namespace Lab
             };
         }
 
-        private void GetCalls()
-        {
-            foreach (CallStatement callStatement in _base.root.GetChildren().Where(
-                obj => obj.GetType() == typeof(CallStatement)))
-            {
-                //Console.WriteLine(callStatement.Name);
-                _statements.Add(GenerateCode(callStatement));
-            }
-        }
-
         private string GenerateId()
         {
             return $"{_currModule}{_currentFreeId++}";
         }
 
-        private void GetExpr()
+        private string GetVarOffset(string var)
         {
-            foreach (Expression expression in _base.root.GetChildren().Where(
-                obj => obj.GetType() == typeof(Expression)))
+            if (_currentNameSpace.GetVarIndex(var) < 0)
             {
-                //Console.WriteLine("aaaaa");
+                return $"+{-_currentNameSpace.GetVarIndex(var)}";
             }
+
+            return $"-{_currentNameSpace.GetVarIndex(var)}";
+        }
+
+        private string TrimPush(string s)
+        {
+            if (s.EndsWith("push eax\n"))
+            {
+                return s.Substring(0, s.IndexOf("push eax\n", StringComparison.Ordinal));
+            }
+
+            return s;
         }
 
         private string GenerateCode(AstNode st)
@@ -283,10 +311,10 @@ namespace Lab
                 AssignStatement assignStatement =>
                     string.Format(TemplateDict[assignStatement.GetType()],
                         GenerateExpr(assignStatement.VarExpr),
-                        (_base.GetVarIndex(assignStatement.VarName)).ToString()),
+                        GetVarOffset(assignStatement.VarName)),
                 ExprStatement exprStatement =>
                     string.Format(TemplateDict[exprStatement.GetType()],
-                        GenerateExpr(exprStatement.expr)),
+                        TrimPush(GenerateExpr(exprStatement.expr))),
                 ConditionalElseStatement conditionalElseStatement =>
                     string.Format(TemplateDict[conditionalElseStatement.GetType()],
                         GenerateExpr(conditionalElseStatement.Condition),
@@ -299,6 +327,8 @@ namespace Lab
                         GenerateExpr(conditionalStatement.Condition),
                         GenerateId(),
                         GenerateCode(conditionalStatement.GetChildren()[0])),
+                DefStatement defStatement =>
+                    GenerateFunction(defStatement),
                 _ => throw new CompilerException(
                     $"Ooops, unknown type, seems like this feature is in development {st.GetType()}" +
                     $" {st.Row + 1}:{st.Column + 1}")

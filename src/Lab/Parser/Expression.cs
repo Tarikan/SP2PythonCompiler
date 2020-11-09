@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Generic;
 
 namespace Lab.Parser
 {
@@ -25,10 +26,19 @@ namespace Lab.Parser
 	public class CallExpression : Expression
 	{
 		public readonly string name;
+
+        public List<Expression> Args;
 		
 		public CallExpression(int row, int col, string name) : base(row, col)
         {
             this.name = name;
+            Args = new List<Expression>();
+        }
+
+        public CallExpression(int row, int col, string name, List<Expression> args) : base(row, col)
+        {
+            this.name = name;
+            Args = args;
         }
 		
 		public override void PrintOp(int depth)
