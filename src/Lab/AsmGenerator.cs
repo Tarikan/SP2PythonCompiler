@@ -55,6 +55,7 @@ namespace Lab
         private string _templateMasm = ".386\n" +
                                       ".model flat,stdcall\n" +
                                       "option casemap:none\n\n" +
+                                      @"include \masm32\include\masm32rt.inc" + "\n" +
                                       "_main        PROTO\n\n" +
                                       "{0}\n" + // insert prototype of functions
                                       ".data\n" +
@@ -72,6 +73,7 @@ namespace Lab
                                       "\n" +
                                       "{1}" + // insert code
                                       "\n" +
+                                      "fn MessageBoxA,0,str$(eax), \"Ivanyshyn Lab5\", MB_OK" +
                                       "\nret\n\n" +
                                       "_main ENDP\n\n" +
                                       "{2}" + // insert functions
