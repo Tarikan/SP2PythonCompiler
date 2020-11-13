@@ -62,7 +62,7 @@ namespace Lab
             
             var tabsC = CountTabs(str);
             //Console.WriteLine(_currentLevel);
-            if (Math.Abs(tabsC - _currentLevel) > 1)
+            if (tabsC - _currentLevel > 1)
             {
                 throw new CompilerException($"Not expected indent at {row + 1}");
                 //_currentLevel++;
@@ -415,6 +415,36 @@ namespace Lab
                 _tokens.Add(new Token()
                 {
                     Kind = TokenKind.FOR,
+                    data = st.ToString(),
+                    row = row,
+                    column = col
+                });
+            }
+            else if (st.ToString().Equals("while"))
+            {
+                _tokens.Add(new Token()
+                {
+                    Kind = TokenKind.WHILE,
+                    data = st.ToString(),
+                    row = row,
+                    column = col
+                });
+            }
+            else if (st.ToString().Equals("break"))
+            {
+                _tokens.Add(new Token()
+                {
+                    Kind = TokenKind.BREAK,
+                    data = st.ToString(),
+                    row = row,
+                    column = col
+                });
+            }
+            else if (st.ToString().Equals("continue"))
+            {
+                _tokens.Add(new Token()
+                {
+                    Kind = TokenKind.CONTINUE,
                     data = st.ToString(),
                     row = row,
                     column = col

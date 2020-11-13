@@ -61,7 +61,43 @@ namespace Lab.Parser
             VarExpr = e;
         }
 	}
+
+    public abstract class Loop : Statement
+    {
+        public Expression Condition { get; set; }
+
+        protected Loop(int row, int col, Expression condition) : base(row, col)
+        {
+            Condition = condition; 
+        }
+    }
+
+    public class ForLoop : Loop
+    {
+        public ForLoop(int row, int col, Expression condition) : base(row, col, condition)
+        {}
+    }
+
+    public class WhileLoop : Loop
+    {
+        public WhileLoop(int row, int col, Expression condition) : base(row, col, condition)
+        {}
+    }
+
+    public class BreakStatement : Statement
+    {
+        public BreakStatement(int row, int col) : base(row, col)
+        {
+        }
+    }
     
+    public class ContinueStatement : Statement
+    {
+        public ContinueStatement(int row, int col) : base(row, col)
+        {
+        }
+    }
+
     public class DefStatement : Statement, IVariableTableContainer
     {
         public List<string> Args;
@@ -164,6 +200,19 @@ namespace Lab.Parser
         public CallStatement(int row, int col) : base(row, col)
         {
             Args = new List<Expression>();
+        }
+    }
+    
+    public class ReturnStatement : Statement
+    {
+        public Expression Expr { get; set; }
+        public ReturnStatement(int row, int col) : base(row, col)
+        {
+        }
+        
+        public ReturnStatement(int row, int col, Expression ret) : base(row, col)
+        {
+            Expr = ret;
         }
     }
 }

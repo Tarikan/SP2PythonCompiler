@@ -67,7 +67,10 @@ namespace Lab
         COLONEQUAL,
         OP,
         KEYWORD,
-        EXCLAMINATION
+        EXCLAMINATION,
+        WHILE,
+        BREAK,
+        CONTINUE
     }
 
     public class Kinds

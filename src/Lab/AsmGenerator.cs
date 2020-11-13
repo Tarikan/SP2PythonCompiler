@@ -22,7 +22,8 @@ namespace Lab
 
         private string _currModule = "MyModule";
         private int _currentFreeId = 0;
-        
+        private string? _currentLoopId = null;
+
         private static readonly Dictionary<Type, string> TemplateDict = new Dictionary<Type, string>()
         {
             {typeof(CallStatement), "call {0}\n"},
@@ -42,8 +43,17 @@ namespace Lab
                                            "cmp eax, 0\n" +
                                            "je {1}else\n" +
                                            "{2}" +
-                                           "{1}else:\n"}
-            
+                                           "{1}else:\n"},
+            {typeof(WhileLoop), "Loop{0}start:\n" +
+                                "{1}" +
+                                "cmp eax, 0\n" +
+                                "je Loop{0}end\n" +
+                                "{2}" +
+                                "jmp Loop{0}start\n" +
+                                "Loop{0}end:\n"},
+            {typeof(BreakStatement), "jmp Loop{0}end"},
+            {typeof(ContinueStatement), "jmp Loop{0}start"}
+
         };
 
         private const string ProcTemplate = "{0} PROC\n" +
@@ -112,10 +122,11 @@ namespace Lab
             var oldNameSpace = _currentNameSpace;
             _currentNameSpace = defStatement;
             var bodystatements = new StringBuilder();
-            if (defStatement.VarCounter != 0)
-            {
-                bodystatements.Append($"push ebp\nmov ebp, esp\nsub ebp, {defStatement.VarCounter * 4}\n");
-            }
+            // if (defStatement.VarCounter != 0)
+            // {
+            //     bodystatements.Append($"push ebp\nmov ebp, esp\nsub ebp, {defStatement.VarCounter * 4}\n");
+            // }
+            bodystatements.Append($"push ebp\nmov ebp, esp\nsub ebp, {defStatement.VarCounter * 4}\n");
             
             foreach (var statement in defStatement.GetChildren())
             {
@@ -129,9 +140,10 @@ namespace Lab
                 bodystatements.Append(GenerateReturn(defStatement.Return));
             }
             if (defStatement.VarCounter != 0)
-            {
-                bodystatements.Append($"add ebp, {defStatement.VarCounter * 4}\nmov esp, ebp\npop ebp\n");
-            }
+            // {
+            //     bodystatements.Append($"add ebp, {defStatement.VarCounter * 4}\nmov esp, ebp\npop ebp\n");
+            // }
+            bodystatements.Append($"add ebp, {defStatement.VarCounter * 4}\nmov esp, ebp\npop ebp\n");
 
             bodystatements.Append($"ret {defStatement.Args.Count * 4}\n");
             
@@ -140,6 +152,17 @@ namespace Lab
                 
             _functions.Add(string.Format(ProcTemplate, defStatement.Name, bodystatements.ToString()));
             return "\n";
+        }
+
+        private string GenerateWhileLoop(WhileLoop whileLoop)
+        {
+            var id = GenerateId();
+            _currentLoopId = id;
+            var ret =  string.Format(TemplateDict[whileLoop.GetType()], id,
+                GenerateExpr(whileLoop.Condition),
+                GenerateCode(whileLoop.GetChildren()[0]));
+            _currentLoopId = null;
+            return ret;
         }
 
         private string GenerateBinExpr(BinOp e)
@@ -224,7 +247,14 @@ namespace Lab
 
         private string GenerateReturn(Expression ret)
         {
-            return $"{GenerateExpr(ret)}\npop eax\n";
+            var func = (DefStatement) _currentNameSpace;
+            var epi = "";
+            if (func.VarCounter != 0)
+            // {
+            //     epi = $"add ebp, {func.VarCounter * 4}\nmov esp, ebp\npop ebp\n";
+            // }
+            epi = $"add ebp, {func.VarCounter * 4}\nmov esp, ebp\npop ebp\n";
+            return $"{GenerateExpr(ret)}\npop eax\nadd ebp, {func.VarCounter * 4}\nmov esp, ebp\npop ebp\nret {func.Args.Count * 4}\n";
         }
 
         private string GenerateCallExpression(CallExpression e)
@@ -324,13 +354,23 @@ namespace Lab
                         GenerateCode(conditionalElseStatement.GetChildren()[0]),
                         GenerateCode(conditionalElseStatement.GetChildren()[1])
                     ),
+                BreakStatement breakStatement => 
+                    string.Format(TemplateDict[breakStatement.GetType()],
+                        _currentLoopId),
+                ContinueStatement continueStatement =>
+                    string.Format(TemplateDict[continueStatement.GetType()],
+                        _currentLoopId),
                 ConditionalStatement conditionalStatement =>
                     string.Format(TemplateDict[conditionalStatement.GetType()],
                         GenerateExpr(conditionalStatement.Condition),
                         GenerateId(),
                         GenerateCode(conditionalStatement.GetChildren()[0])),
+                WhileLoop whileLoop =>
+                    GenerateWhileLoop(whileLoop),
                 DefStatement defStatement =>
                     GenerateFunction(defStatement),
+                ReturnStatement returnStatement =>
+                    GenerateReturn(returnStatement.Expr),
                 _ => throw new CompilerException(
                     $"Ooops, unknown type, seems like this feature is in development {st.GetType()}" +
                     $" {st.Row + 1}:{st.Column + 1}")

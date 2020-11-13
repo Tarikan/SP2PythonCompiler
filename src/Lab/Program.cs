@@ -18,7 +18,7 @@ namespace Lab
             Stopwatch stopwatch = new Stopwatch();
             stopwatch.Start();
             Console.WriteLine("C# compiler for python by Taras Ivanyshyn\n" +
-                              "Lab5");
+                              "Lab6");
 
             //Console.WriteLine(Code);
 

@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Security.Cryptography;
 using System.Threading;
 using Lab.Interfaces;
 
@@ -15,6 +16,8 @@ namespace Lab.Parser
         private readonly TwoWayEnum<Token> _enumerator;
         
         private readonly Ast _base;
+
+        private Loop? _currentLoop = null;
 
         private IVariableTableContainer _currentNameSpace;
 
@@ -184,7 +187,7 @@ namespace Lab.Parser
                     {
                         var temp = ParseConditional();
                         baseNode.AddChild(temp);
-                        _enumerator.MovePrevious();
+                        //_enumerator.MovePrevious();
                         break;
                     }
                     case TokenKind.INT:
@@ -199,6 +202,52 @@ namespace Lab.Parser
                         //Console.WriteLine(temp.ToString());
                         baseNode.AddChild(temp);
                         MatchIndentationCurrent();
+                        break;
+                    }
+                    case TokenKind.WHILE:
+                    {
+                        var temp = ParseWhileLoop();
+                        baseNode.AddChild(temp);
+                        break;
+                    }
+                    case TokenKind.BREAK:
+                    {
+                        if (_currentLoop == null)
+                        {
+                            throw new CompilerException($"Break is outside of loop at {_enumerator.Current.row}:" +
+                                                        $"{_enumerator.Current.column}",
+                                _enumerator.Current.row, 
+                                _enumerator.Current.column);
+                        }
+                        baseNode.AddChild(new BreakStatement(_enumerator.Current.row, 
+                            _enumerator.Current.column));
+                        break;
+                    }
+                    case TokenKind.CONTINUE:
+                    {
+                        if (_currentLoop == null)
+                        {
+                            throw new CompilerException($"Continue is outside of loop at {_enumerator.Current.row}:" +
+                                                        $"{_enumerator.Current.column}",
+                                _enumerator.Current.row, 
+                                _enumerator.Current.column);
+                        }
+                        baseNode.AddChild(new ContinueStatement(_enumerator.Current.row, 
+                            _enumerator.Current.column));
+                        break;
+                    }
+                    case TokenKind.RETURN:
+                    {
+                        if (_currentNameSpace.GetType() != typeof(DefStatement))
+                        {
+                            throw new CompilerException($"Return outside of function at {_enumerator.Current.row}:" +
+                                                        $"{_enumerator.Current.column}",
+                                _enumerator.Current.row, 
+                                _enumerator.Current.column);
+                        }
+                        var t = _enumerator.Current;
+                        _enumerator.MovePrevious();
+                        baseNode.AddChild(new ReturnStatement(t.row, t.column, MatchReturn()));
                         break;
                     }
                     default:
@@ -237,14 +286,15 @@ namespace Lab.Parser
             {
                 var prevNameSpace = _currentNameSpace;
                 _currentNameSpace = def;
-                ParseUntil(def, TokenKind.RETURN);
+                //ParseUntil(def, TokenKind.RETURN);
+                ParseUntil(def, TokenKind.DEDENT);
                 //Console.WriteLine(string.Join(", ", def.varTable.Keys.ToList()));
                 //Console.WriteLine(string.Join(", ", _base.varTable.ToList()));
-                _enumerator.MovePrevious();
                 //_enumerator.MovePrevious();
-                def.Return = this.MatchReturn();
-                this.MatchCurrent(TokenKind.NEWLINE);
-                this.Match(TokenKind.DEDENT);
+                //_enumerator.MovePrevious();
+                //def.Return = this.MatchReturn();
+                //this.MatchCurrent(TokenKind.NEWLINE);
+                //this.Match(TokenKind.DEDENT);
                 /*
                 Console.WriteLine(def.Name);
                 foreach (var kvp in def.varTable)
@@ -262,16 +312,35 @@ namespace Lab.Parser
             return def;
         }
 
-        private Statement ParseName()
+        private Statement ParseWhileLoop()
         {
-            var res = new CallStatement(_enumerator.Current.row, _enumerator.Current.column)
+            var token = _enumerator.Current;
+            _enumerator.MoveNext();
+            var ret = new WhileLoop(token.row,
+                token.column, ParseExpr());
+            _currentLoop = ret;
+            //_enumerator.MovePrevious();
+            MatchCurrent(TokenKind.COLON);
+            if (!_enumerator.MoveNext())
             {
-                Name = _enumerator.Current.data,
-                Args = this.MatchArgs()
-            };
-
-            res.Args.Reverse();
-            return res;
+                _enumerator.MovePrevious();
+                throw new CompilerException($"Expected token at {_enumerator.Current.row}:{_enumerator.Current.column}",
+                    _enumerator.Current.row, _enumerator.Current.column);
+            }
+            var body = new BlockStatement(_enumerator.Current.row, _enumerator.Current.column);
+            if (MatchCurrentBool(TokenKind.NEWLINE))
+            {
+                Match(TokenKind.INDENT);
+                _enumerator.MovePrevious();
+                ParseUntil(body, TokenKind.DEDENT);
+            }
+            else
+            {
+                ParseUntil(body, TokenKind.NEWLINE);
+            }
+            ret.AddChild(body);
+            _currentLoop = null;
+            return ret;
         }
 
         private Statement ParseConditional()
@@ -282,7 +351,8 @@ namespace Lab.Parser
                 _enumerator.Current.column
             };
             if (!_enumerator.MoveNext()) {throw new SyntaxException("Token expected",
-                rowCol.row, rowCol.column);}
+                rowCol.row, rowCol.column);
+            }
             var condition = ParseExpr();
             MatchCurrent(TokenKind.COLON);
             
@@ -321,6 +391,7 @@ namespace Lab.Parser
                 condition
             );
             conditionalStatement.AddChild(body);
+            
             return conditionalStatement;
         }
 
