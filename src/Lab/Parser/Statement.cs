@@ -189,7 +189,7 @@ namespace Lab.Parser
             foreach (var index in indexes)
             {
                 if (varTable[index] > 0) varTable[index] += 4;
-                else varTable[index] -= 4;
+                //else varTable[index] -= 4;
             }
         }
     }
@@ -213,6 +213,14 @@ namespace Lab.Parser
         public ReturnStatement(int row, int col, Expression ret) : base(row, col)
         {
             Expr = ret;
+        }
+    }
+    
+    public class Print : Statement
+    {
+        public Expression expr { get; set; }
+        public Print(int row, int col) : base(row, col)
+        {
         }
     }
 }

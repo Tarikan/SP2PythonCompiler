@@ -236,6 +236,16 @@ namespace Lab.Parser
                             _enumerator.Current.column));
                         break;
                     }
+                    case TokenKind.PRINT:
+                    {
+                        var temp = new Print(_enumerator.Current.row, _enumerator.Current.column);
+                        Match(TokenKind.LPAR);
+                        temp.expr = ParseExpr();
+                        _enumerator.MovePrevious();
+                        MatchCurrent(TokenKind.RPAR);
+                        baseNode.AddChild(temp);
+                        break;
+                    }
                     case TokenKind.RETURN:
                     {
                         if (_currentNameSpace.GetType() != typeof(DefStatement))
@@ -662,6 +672,21 @@ namespace Lab.Parser
                 }
             }
 
+            if (MatchCurrentBool(TokenKind.CIRCUMFLEX))
+            {
+                var op = _enumerator.Current.Kind;
+                if (_enumerator.MoveNext())
+                {
+                    var fourth = ParseExpr();
+                    first = new BinOp(first.Row,
+                        first.Column,
+                        op,
+                        first,
+                        fourth
+                    );
+                }
+            }
+
             //first.PrintOp(0);
             
             return first;
@@ -673,7 +698,8 @@ namespace Lab.Parser
             var first = ParseFactor();
             while (_enumerator.MoveNext() &&
                    (MatchCurrentBool(TokenKind.STAR) || 
-                   MatchCurrentBool(TokenKind.SLASH)))
+                   MatchCurrentBool(TokenKind.SLASH) ||
+                   MatchCurrentBool(TokenKind.PERCENT)))
             {
                 var op = _enumerator.Current.Kind;
                 var errRow = _enumerator.Current.row;

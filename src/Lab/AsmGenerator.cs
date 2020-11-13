@@ -46,13 +46,15 @@ namespace Lab
                                            "{1}else:\n"},
             {typeof(WhileLoop), "Loop{0}start:\n" +
                                 "{1}" +
+                                "pop eax\n" +
                                 "cmp eax, 0\n" +
                                 "je Loop{0}end\n" +
                                 "{2}" +
                                 "jmp Loop{0}start\n" +
                                 "Loop{0}end:\n"},
             {typeof(BreakStatement), "jmp Loop{0}end"},
-            {typeof(ContinueStatement), "jmp Loop{0}start"}
+            {typeof(ContinueStatement), "jmp Loop{0}start"},
+            {typeof(Print), "{0}printf(str$(eax))\nprintf(\"\\n\")\n"}
 
         };
 
@@ -73,9 +75,9 @@ namespace Lab
                                       "_start:\n" +
                                       "push ebp\n" + 
                                       "mov ebp, esp\n" +
-                                      "sub ebp, {3}\n"+
+                                      "sub esp, {3}\n"+
                                       "invoke  _main\n" +
-                                      "add ebp, {3}\n"+
+                                      "add esp, {3}\n"+
                                       "mov esp, ebp\n" +
                                       "pop ebp\n" +
                                       "ret\n" +
@@ -83,7 +85,9 @@ namespace Lab
                                       "\n" +
                                       "{1}" + // insert code
                                       "\n" +
-                                      "fn MessageBoxA,0,str$(eax), \"Ivanyshyn Lab5\", MB_OK" +
+                                      ";fn MessageBoxA,0,str$(eax), \"Ivanyshyn Lab6\", MB_OK\n" +
+                                      "printf(\"\\n\")\n" +
+                                      "inkey\n" +
                                       "\nret\n\n" +
                                       "_main ENDP\n\n" +
                                       "{2}" + // insert functions
@@ -106,7 +110,7 @@ namespace Lab
             }
 
             using (FileStream fs = File.Create(
-                "5-8-CSHARP-IO-81-Ivanyshyn.asm"))
+                "6-8-CSHARP-IO-81-Ivanyshyn.asm"))
             {
                 byte[] info = new UTF8Encoding(true).GetBytes(
                     string.Format(_templateMasm, string.Join("", _functionProtoNames.ToArray()),
@@ -122,11 +126,7 @@ namespace Lab
             var oldNameSpace = _currentNameSpace;
             _currentNameSpace = defStatement;
             var bodystatements = new StringBuilder();
-            // if (defStatement.VarCounter != 0)
-            // {
-            //     bodystatements.Append($"push ebp\nmov ebp, esp\nsub ebp, {defStatement.VarCounter * 4}\n");
-            // }
-            bodystatements.Append($"push ebp\nmov ebp, esp\nsub ebp, {defStatement.VarCounter * 4}\n");
+            bodystatements.Append($"push ebp\nmov ebp, esp\nsub esp, {defStatement.VarCounter * 4}\n");
             
             foreach (var statement in defStatement.GetChildren())
             {
@@ -134,16 +134,8 @@ namespace Lab
                 bodystatements.Append(GenerateCode(statement));
                 bodystatements.Append('\n');
             }
-
-            if (defStatement.Return != null)
-            {
-                bodystatements.Append(GenerateReturn(defStatement.Return));
-            }
-            if (defStatement.VarCounter != 0)
-            // {
-            //     bodystatements.Append($"add ebp, {defStatement.VarCounter * 4}\nmov esp, ebp\npop ebp\n");
-            // }
-            bodystatements.Append($"add ebp, {defStatement.VarCounter * 4}\nmov esp, ebp\npop ebp\n");
+            
+            bodystatements.Append($"add esp, {defStatement.VarCounter * 4}\nmov esp, ebp\npop ebp\n");
 
             bodystatements.Append($"ret {defStatement.Args.Count * 4}\n");
             
@@ -158,6 +150,7 @@ namespace Lab
         {
             var id = GenerateId();
             _currentLoopId = id;
+            //Console.WriteLine(GenerateExpr(whileLoop.Condition));
             var ret =  string.Format(TemplateDict[whileLoop.GetType()], id,
                 GenerateExpr(whileLoop.Condition),
                 GenerateCode(whileLoop.GetChildren()[0]));
@@ -186,6 +179,10 @@ namespace Lab
             {
                 code = $"{b}\n{a}\npop eax\npop ebx\nxor edx, edx\ndiv ebx\npush eax\n";
             }
+            else if (e.Op == TokenKind.PERCENT)
+            {
+                code = $"{b}\n{a}\npop eax\npop ebx\nxor edx, edx\ndiv ebx\npush edx\n";
+            }
             else if (e.Op == TokenKind.EQEQUAL)
             {
                 code = $"{b}\n{a}\npop eax\npop ecx\ncmp eax, ecx\nmov eax, 0\nsete al\npush eax\n";
@@ -209,6 +206,10 @@ namespace Lab
             else if (e.Op == TokenKind.LESSEQUAL)
             {
                 code = $"{b}\n{a}\npop eax\npop ecx\ncmp ecx, eax\nmov eax, 0\nsetge al\npush eax\n";
+            }
+            else if (e.Op == TokenKind.CIRCUMFLEX)
+            {
+                code = $"{b}\n{a}\npop eax\npop ecx\nxor eax, ecx\npush eax\n";
             }
             else
             {
@@ -248,13 +249,7 @@ namespace Lab
         private string GenerateReturn(Expression ret)
         {
             var func = (DefStatement) _currentNameSpace;
-            var epi = "";
-            if (func.VarCounter != 0)
-            // {
-            //     epi = $"add ebp, {func.VarCounter * 4}\nmov esp, ebp\npop ebp\n";
-            // }
-            epi = $"add ebp, {func.VarCounter * 4}\nmov esp, ebp\npop ebp\n";
-            return $"{GenerateExpr(ret)}\npop eax\nadd ebp, {func.VarCounter * 4}\nmov esp, ebp\npop ebp\nret {func.Args.Count * 4}\n";
+            return $"{GenerateExpr(ret)}\npop eax\nadd esp, {func.VarCounter * 4}\nmov esp, ebp\npop ebp\nret {func.Args.Count * 4}\n";
         }
 
         private string GenerateCallExpression(CallExpression e)
@@ -371,6 +366,9 @@ namespace Lab
                     GenerateFunction(defStatement),
                 ReturnStatement returnStatement =>
                     GenerateReturn(returnStatement.Expr),
+                Print print =>
+                    string.Format(TemplateDict[print.GetType()],
+                        TrimPush(GenerateExpr(print.expr))),
                 _ => throw new CompilerException(
                     $"Ooops, unknown type, seems like this feature is in development {st.GetType()}" +
                     $" {st.Row + 1}:{st.Column + 1}")

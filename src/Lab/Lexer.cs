@@ -440,6 +440,16 @@ namespace Lab
                     column = col
                 });
             }
+            else if (st.ToString().Equals("print"))
+            {
+                _tokens.Add(new Token()
+                {
+                    Kind = TokenKind.PRINT,
+                    data = st.ToString(),
+                    row = row,
+                    column = col
+                });
+            }
             else if (st.ToString().Equals("continue"))
             {
                 _tokens.Add(new Token()

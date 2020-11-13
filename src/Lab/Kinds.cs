@@ -70,7 +70,8 @@ namespace Lab
         EXCLAMINATION,
         WHILE,
         BREAK,
-        CONTINUE
+        CONTINUE,
+        PRINT
     }
 
     public class Kinds
